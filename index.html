@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlgoGrowth Hub - Build. Grow. Monetize.</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for standard icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header id="header-container"></header>
+
+  <main>
+    <!-- Hero Section -->
+    <section id="home" class="hero-section"></section>
+
+    <!-- Who We Are / Core Team Section -->
+    <section id="about" class="about-section section"></section>
+
+    <!-- Services Section -->
+    <section id="services" class="services-section section"></section>
+
+    <!-- Creator Network Section -->
+    <section id="creators" class="creators-section section"></section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="resources-section section"></section>
+
+    <!-- Community Section -->
+    <section id="community" class="community-section section"></section>
+
+    <!-- FAQs Section -->
+    <section id="faqs" class="faqs-section section"></section>
+
+    <!-- Book a Call Section -->
+    <section id="booking" class="booking-section section"></section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer-container"></footer>
+
+  <!-- UPI Payment Modal -->
+  <div id="payment-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closePaymentModal()" aria-label="Close modal">&times;</button>
+      <div class="modal-header">
+        <span class="badge">Booking Action Required</span>
+        <h2>Commitment Fee Required</h2>
+      </div>
+      <div class="modal-body">
+        <p>To secure your selected date and time slot, please complete the nominal commitment payment of <strong>₹50</strong> via UPI.</p>
+        <div class="upi-box">
+          <div class="upi-row">
+            <span class="upi-label">UPI ID:</span>
+            <strong class="upi-value" id="upi-val">algowinner01official@okaxis</strong>
+          </div>
+          <div class="upi-row">
+            <span class="upi-label">Amount:</span>
+            <strong class="upi-value" id="fee-val">₹50</strong>
+          </div>
+        </div>
+        <p class="modal-note"><i class="fa-solid fa-circle-info"></i> After completing the payment, click the button below. This will compose the booking confirmation email to our team for quick slot validation.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="proceedToEmail()" style="width: 100%;">
+          Confirm Payment & Send Email <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Policy Modals (Privacy, Terms, Refund) -->
+  <div id="policy-modal" class="modal-overlay">
+    <div class="modal-content policy-box">
+      <button class="modal-close-btn" onclick="closePolicyModal()" aria-label="Close modal">&times;</button>
+      <div class="modal-header">
+        <h2 id="policy-title">Policy Title</h2>
+      </div>
+      <div class="modal-body policy-scrollable" id="policy-body">
+        <!-- Dynamic Policy Content Goes Here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>
