@@ -6,7 +6,6 @@ const websiteData = {
       { text: "Home", href: "#home" },
       { text: "Who We Are", href: "#about" },
       { text: "Services", href: "#services" },
-      { text: "Creator Network", href: "#creators" },
       { text: "Resources", href: "#resources" },
       { text: "FAQs", href: "#faqs" },
       { text: "Book Call", href: "#booking" }
@@ -66,7 +65,7 @@ const websiteData = {
         role: "Tech & Product Lead",
         image: "assets/Gaurav (2).jpg",
         initials: "GY",
-        bio: "Gaurav is the technology backbone of AlgoGrowth Hub, specializing in full-stack development, AI automation, backend architecture, and DevOps. He builds scalable websites, intelligent workflows, and modern digital solutions that power efficient business operations and seamless user experiences.",
+        bio: "Gaurav is the technology backbone of AlgoGrowthHub, specializing in full-stack development, AI automation, backend architecture, and DevOps. He builds scalable websites, intelligent workflows, and modern digital solutions that power efficient business operations and seamless user experiences.",
         socials: {
           instagram: "https://instagram.com/algowinner01",
           telegram: "https://t.me/algowinner01"
@@ -75,7 +74,7 @@ const websiteData = {
     ]
   },
   services: {
-    title: "Services we provide to grow as a morden creator.",
+    title: "Services we provide to grow as a modern creator.",
     list: [
       { title: "Instagram & Audience Growth", description: "Implement data-backed organic strategy blueprints designed to grow your target audience with high-intent buyers.", icon: "instagram" },
       { title: "AI & Workflow Automation", description: "Save up to 20 hours a week by automating standard repetitive processes, lead generation pipelines, and script tasks.", icon: "cpu" },
@@ -83,23 +82,6 @@ const websiteData = {
       { title: "Professional Video Editing", description: "High-retention editing style optimized to maintain average watch times and trigger algorithm distribution.", icon: "video" },
       { title: "Personal Branding & Design", description: "Craft a premium visual identity and messaging guidelines that establish authority and build trust instantly.", icon: "award" },
       { title: "Digital Product Launch", description: "Design, build, and launch digital courses, template libraries, and ebooks that generate predictable passive revenue streams.", icon: "shopping-bag" }
-    ]
-  },
-  creators: {
-    title: "Creator Community",
-    subtitle: "Meet the creators shaping the future of the creator economy.",
-    list: [
-      { name: "Arjun Mehta", role: "Content Strategy", initials: "AM", bio: "Turning raw scripts into compounding assets." },
-      { name: "Priya Sharma", role: "Personal Branding", initials: "PS", bio: "Helping creators stand out in crowded niches." },
-      { name: "Rohan Kapoor", role: "Video Production", initials: "RK", bio: "Cinematic digital storytelling that converts." },
-      { name: "Ananya Desai", role: "Graphic Design", initials: "AD", bio: "Visual systems that elevate digital products." },
-      { name: "Karthik Nair", role: "AI Automation", initials: "KN", bio: "Tech integration and automated pipelines." },
-      { name: "Sneha Patel", role: "Social Media", initials: "SP", bio: "Growth hacking and community moderation." },
-      { name: "Aditya Singh", role: "Freelance Strategy", initials: "AS", bio: "Helping solo builders scale to six figures." },
-      { name: "Rahul K.", role: "Content Creator", initials: "RK", bio: "Short-form video consistency and scripting." },
-      { name: "Neha S.", role: "Digital Marketer", initials: "NS", bio: "Paid ads and funnels for course creators." },
-      { name: "Amit P.", role: "Freelancer", initials: "AP", bio: "Web design and copy audit automation." },
-      { name: "Gaurav Yadav", role: "Tech & Product Lead", initials: "GY", bio: "Specializes in system architecture, backend development, and technical execution. Ensures reliable, scalable, and maintainable software solutions."} 
     ]
   },
   resources: {
@@ -135,7 +117,7 @@ const websiteData = {
     title: "Book a strategic Call",
     subtitle: "Select a date and time slot to book your strategy session.",
     email: "algowinner01official@gmail.com",
-    phone: "+91 7897808610",
+    phone: "+91 9369348311",
     upiId: "algowinner01official@okaxis",
     fee: "50",
     instagram: "https://instagram.com/algowinner01",

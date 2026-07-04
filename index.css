@@ -339,9 +339,12 @@ body:not(.light-mode) .logo-img {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1fr;
   gap: 3.5rem;
   align-items: center;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .hero-content h1 {
@@ -356,6 +359,8 @@ body:not(.light-mode) .logo-img {
   color: var(--text-muted);
   margin-bottom: 2rem;
   max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-quote {
@@ -363,13 +368,18 @@ body:not(.light-mode) .logo-img {
   color: var(--accent-color);
   font-size: 1rem;
   margin-bottom: 2rem;
-  border-left: 3px solid var(--accent-color);
-  padding-left: 1rem;
+  border-top: 1.5px solid var(--accent-color);
+  border-bottom: 1.5px solid var(--accent-color);
+  padding: 0.5rem 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-ctas {
   display: flex;
   gap: 1.25rem;
+  justify-content: center;
 }
 
 /* Decorative Hero Right */

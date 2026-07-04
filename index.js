@@ -16,10 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   renderHeader();
   renderHero();
-  setupChartTracker();
   renderAboutSection();
   renderServices();
-  renderCreatorNetwork();
   renderResources();
   renderCommunity();
   renderFAQs();
@@ -152,68 +150,6 @@ function renderHero() {
             </a>
           </div>
         </div>
-        
-        <div class="hero-visual">
-          <div class="hero-circle-bg"></div>
-          <div class="hero-chart-card">
-            <div class="chart-header">
-              <div>
-                <span class="chart-badge">Live Analytics</span>
-                <h3 class="chart-title">Audience Growth</h3>
-              </div>
-              <div class="chart-stat"><i class="fa-solid fa-arrow-trend-up"></i> +148.2%</div>
-            </div>
-            <div class="chart-body" id="hero-chart-body">
-              <svg viewBox="0 0 400 200" class="growth-svg" id="growth-svg">
-                <!-- Grid Lines -->
-                <line x1="0" y1="40" x2="400" y2="40" stroke="var(--border-color)" stroke-dasharray="4" />
-                <line x1="0" y1="80" x2="400" y2="80" stroke="var(--border-color)" stroke-dasharray="4" />
-                <line x1="0" y1="120" x2="400" y2="120" stroke="var(--border-color)" stroke-dasharray="4" />
-                <line x1="0" y1="160" x2="400" y2="160" stroke="var(--border-color)" stroke-dasharray="4" />
-                
-                <!-- Area Gradient -->
-                <defs>
-                  <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="var(--accent-color)" stop-opacity="0.25" />
-                    <stop offset="100%" stop-color="var(--accent-color)" stop-opacity="0.0" />
-                  </linearGradient>
-                  
-                  <linearGradient id="stroke-grad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#837ab6" />
-                    <stop offset="50%" stop-color="#f6a5c0" />
-                    <stop offset="100%" stop-color="#1EAE98" />
-                  </linearGradient>
-                </defs>
-                
-                <!-- Chart Area Path -->
-                <path d="M 0 190 L 0 170 Q 25 165, 50 160 T 100 130 T 150 145 T 200 95 T 250 110 T 300 60 T 350 75 T 400 20 L 400 190 Z" fill="url(#chart-grad)" />
-                
-                <!-- Chart Line Path -->
-                <path class="chart-line-path" d="M 0 170 Q 25 165, 50 160 T 100 130 T 150 145 T 200 95 T 250 110 T 300 60 T 350 75 T 400 20" fill="none" stroke="url(#stroke-grad)" stroke-width="4" stroke-linecap="round" />
-                
-                <!-- Pulsing Glow Dot at the end -->
-                <circle cx="400" cy="20" r="5" fill="#1EAE98" />
-                <circle cx="400" cy="20" r="10" fill="#1EAE98" opacity="0.4" class="pulsing-dot" style="animation: pulse 2s infinite;" />
-
-                <!-- Vertical Indicator Line (Toggled via JS hover) -->
-                <line id="tracker-line" x1="0" y1="0" x2="0" y2="200" stroke="var(--accent-color)" stroke-width="1.5" stroke-dasharray="2" style="display: none;" />
-                <circle id="tracker-dot" cx="0" cy="0" r="5" fill="var(--accent-color)" style="display: none;" />
-              </svg>
-              <!-- Interactive Tooltip -->
-              <div id="chart-tooltip" class="chart-tooltip" style="display: none;">
-                <span id="tooltip-date">Month 1</span>
-                <strong id="tooltip-value">+0%</strong>
-              </div>
-            </div>
-            <div class="chart-footer">
-              <span>Jan</span>
-              <span>Mar</span>
-              <span>May</span>
-              <span>Jul</span>
-              <span>Sep</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   `;
@@ -309,54 +245,6 @@ function renderServices() {
       
       <div class="services-grid">
         ${cardsHtml}
-      </div>
-    </div>
-  `;
-}
-
-/* --------------------------------------------------------------------------
-   6. Render Creator Network Section
-   -------------------------------------------------------------------------- */
-function renderCreatorNetwork() {
-  const section = document.getElementById("creators");
-  const data = websiteData.creators;
-
-  const cardsHtml = data.list
-    .map(creator => {
-      const avatarHtml = creator.image ? 
-        `<img src="${creator.image}" alt="${creator.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--card-bg); transition: all 0.4s ease;">` : 
-        `<div class="creator-avatar-circle">${creator.initials}</div>`;
-      return `
-        <div class="creator-card">
-          <div class="creator-banner"></div>
-          <div class="creator-avatar-container">
-            ${avatarHtml}
-          </div>
-          <div class="creator-content">
-            <span class="creator-role">${creator.role}</span>
-            <h3 class="creator-name">${creator.name}</h3>
-            <p class="creator-bio">${creator.bio}</p>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
-
-  section.innerHTML = `
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tagline">${data.title}</span>
-        <h2 class="section-title">${data.subtitle}</h2>
-      </div>
-      
-      <div class="creators-slider-container">
-        <div class="creators-slider-track" id="creators-slider-track">
-          ${cardsHtml}
-        </div>
-        <div class="slider-controls">
-          <button class="slider-btn" onclick="slideCreators('left')" aria-label="Slide Left"><i class="fa-solid fa-chevron-left"></i></button>
-          <button class="slider-btn" onclick="slideCreators('right')" aria-label="Slide Right"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
       </div>
     </div>
   `;
@@ -517,10 +405,6 @@ function renderBookingSection() {
                 <p>${data.phone}</p>
               </div>
             </div>
-          </div>
-          
-          <div style="font-size: 0.9rem; color: var(--text-muted);">
-            Secure reservation framework. 100% money-back guarantee.
           </div>
         </div>
         
@@ -693,17 +577,6 @@ function showPolicy(policyKey) {
 
 function closePolicyModal() {
   document.getElementById("policy-modal").classList.remove("active");
-}
-
-function slideCreators(direction) {
-  const track = document.getElementById("creators-slider-track");
-  if (!track) return;
-  const scrollAmount = track.clientWidth * 0.8;
-  if (direction === 'left') {
-    track.scrollLeft -= scrollAmount;
-  } else {
-    track.scrollLeft += scrollAmount;
-  }
 }
 
 function setupChartTracker() {
