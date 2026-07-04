@@ -285,6 +285,10 @@ body:not(.light-mode) .logo-img {
   color: var(--text-main);
 }
 
+.mobile-cta-li {
+  display: none;
+}
+
 /* Right Nav Controls */
 .nav-actions {
   display: flex;
@@ -1440,6 +1444,14 @@ body.light-mode .modal-overlay {
   .nav-actions {
     gap: 1rem;
   }
+  .nav-actions .btn-primary {
+    display: none;
+  }
+  .mobile-cta-li {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
   .hero-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -1463,7 +1475,8 @@ body.light-mode .modal-overlay {
     justify-content: center;
   }
   .hero-visual {
-    height: 300px;
+    height: auto;
+    padding: 1.5rem 0;
   }
   .hero-circle-bg {
     width: 250px;

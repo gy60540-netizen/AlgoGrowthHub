@@ -76,6 +76,11 @@ function renderHeader() {
         
         <ul class="nav-menu" id="nav-menu">
           ${linksHtml}
+          <li class="mobile-cta-li">
+            <a href="${data.ctaButton.href}" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center;">
+              ${data.ctaButton.text} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem;"></i>
+            </a>
+          </li>
         </ul>
         
         <div class="nav-actions">
