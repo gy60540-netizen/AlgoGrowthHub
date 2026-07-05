@@ -1,6 +1,6 @@
 const websiteData = {
   header: {
-    logoText: "AlgoGrowth Hub",
+    logoText: "AlgoGrowthHub",
     logoPath: "assets/logo.png",
     navLinks: [
       { text: "Home", href: "#home" },
@@ -16,11 +16,11 @@ const websiteData = {
     }
   },
   hero: {
-    title: "Build. Grow. Monetize.",
+    title: "STRUCTURE. SERVE. SCALE",
     description: "We help creators, coaches and personal brands build scalable content systems, automate workflows and turn their audience into profitable businesses.",
-    quote: "Build systems that scale, not just profiles that post.",
+    quote: "​Cracking algorithms for creator loyalty; Hacking attention for brand conversion.",
     primaryCta: {
-      text: "Join Creator Network",
+      text: "Join Telegram Link ",
       href: "https://t.me/algowinner01"
     },
     secondaryCta: {
@@ -36,16 +36,16 @@ const websiteData = {
   about: {
     title: "Who We Are",
     tagline: "Where Modern Creators Grow Together.",
-    description: "AlgoGrowthHub is a creator-first growth company helping ambitious creators build profitable digital businesses through strategy, automation, content systems and execution.",
+    description: "AlgoGrowthHub is a creator-first growth agency helping ambitious creators build profitable digital businesses through strategy, automation, content systems and execution.",
     team: [
       {
-        name: "Harshit Varma",
+        name: "Harshit Verma",
         role: "Growth Strategist",
         image: "assets/smm.jpg",
         initials: "HV",
         bio: "Harshit specializes in content strategy, scriptwriting, audience growth, and creator engagement. With over three years of experience, he develops data-driven content systems, manages creator communications, and helps brands build consistent growth through strategic planning and performance analysis.",
         socials: {
-          instagram: "https://instagram.com/algowinner01",
+          instagram: "https://www.instagram.com/algogrowth01?igsh=OGU0bHlrMmtoanJi",
           telegram: "https://t.me/algowinner01"
         }
       },
@@ -54,7 +54,7 @@ const websiteData = {
         role: "Founder & Creative Director",
         image: "assets/raghu.jpg",
         initials: "RC",
-        bio: "As Founder & Creative Director, Raghav leads the vision and execution behind AlgoGrowth Hub. His expertise spans AI, content strategy, branding, digital marketing, and business growth systems. He works closely with creators, startups, and businesses to transform ideas into scalable digital brands through strategic planning, premium creative execution, and technology-driven solutions..",
+        bio: "As Founder & Creative Director, Raghav leads the vision and execution behind AlgoGrowthHub. His expertise spans AI, content strategy, branding, digital marketing, and business growth systems. He works closely with creators, startups, and businesses to transform ideas into scalable digital brands through strategic planning, premium creative execution, and technology-driven solutions..",
         socials: {
           instagram: "https://instagram.com/algowinner01",
           telegram: "https://t.me/algowinner01"
@@ -67,7 +67,7 @@ const websiteData = {
         initials: "GY",
         bio: "Gaurav is the technology backbone of AlgoGrowthHub, specializing in full-stack development, AI automation, backend architecture, and DevOps. He builds scalable websites, intelligent workflows, and modern digital solutions that power efficient business operations and seamless user experiences.",
         socials: {
-          instagram: "https://instagram.com/algowinner01",
+          instagram: "https://www.instagram.com/_gaurav.45_",
           telegram: "https://t.me/algowinner01"
         }
       }
@@ -88,21 +88,47 @@ const websiteData = {
     title: "Free Resources",
     subtitle: "Tools and templates to accelerate your growth.",
     list: [
-      { title: "AI Prompt Library", description: "Curated system prompts for brainstorming content, script hooks, and workflow optimization." },
-      { title: "Clipping Blueprint", description: "Our step-by-step master plan for repurposing long-form webinars into 15+ viral short clips." },
-      { title: "Useful AI Tools", description: "A handpicked library of the absolute best AI tools for content, sales, and design." }
+      {
+        title: "Growth Strategy",
+        description: "Curated system prompts for brainstorming content, script hooks, and workflow optimization.",
+        files: [
+          { name: "Claude System Prompt Guide", path: "assets/Steal_My_Claude_System.pdf" },
+          { name: "Automate Instagram with Claude", path: "assets/Automate_Instagram_With_Claude.pdf" }
+        ]
+      },
+      {
+        title: "Clipping Blueprint",
+        description: "Our step-by-step master plan for repurposing long-form webinars into 15+ viral short clips.",
+        files: [
+          { name: "Clipping Blueprint Guide", path: "assets/Clipping.pdf" },
+          { name: "Clipping Blueprint Sheet", path: "assets/clipping_blueprint.pdf" }
+        ]
+      },
+      {
+        title: "Professional Audits",
+        description: "Growth breakdown and professional audits of some big creators to understand their strategy.",
+        files: [
+          { name: "Aryan Kelvin Virality Breakdown", path: "assets/Aryan Kelvin Virality Breakdown – algowinner01.pdf" },
+          { name: "The Kumar Method Viral Audit Playbook", path: "assets/The_Kumar_Method_Viral_Audit_Playbook.pdf" }
+        ]
+      }
     ],
-    premiumLink: {
+    premium: {
       text: "Explore Premium Resources",
       description: "Advanced playbooks, masterminds, and operational templates for serious creator businesses.",
-      href: "#booking"
+      href: "#booking",
+      files: [
+        { name: "Creator Operating System (Notion Template)", locked: true },
+        { name: "High-Retention Sound & Preset Asset Library", locked: true },
+        { name: "SOP Client Onboarding & Automation SOPs", locked: true }
+      ]
     }
   },
   community: {
     title: "Join India's Fastest Growing Creator Community",
     description: "A growing network of creators sharing strategies, collaborating on projects, and building together. No fluff - just execution.",
     telegramLink: "https://t.me/algowinner01",
-    whatsappLink: "https://chat.whatsapp.com/Dn7SZY5fneI7xEX0hLtm3K"
+    whatsappLink: "https://forms.gle/SktJ4ZUoYxDFKDKy5"
   },
   faqs: {
     title: "Frequently Asked Questions",
@@ -119,7 +145,7 @@ const websiteData = {
     email: "algowinner01official@gmail.com",
     phone: "+91 9369348311",
     upiId: "algowinner01official@okaxis",
-    fee: "50",
+    fee: "49",
     instagram: "https://instagram.com/algowinner01",
     telegram: "https://t.me/algowinner01",
     whatsapp: "https://chat.whatsapp.com/AlgoGrowthHub",
@@ -128,11 +154,11 @@ const websiteData = {
   policies: {
     privacy: {
       title: "Privacy Policy",
-      content: `At AlgoGrowth Hub, accessible from our website, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by AlgoGrowth Hub and how we use it.<br><br><b>Information We Collect</b><br>The personal information that you are asked to provide, and the reasons why you are asked to provide it, will be made clear to you at the point we ask you to provide your personal information (e.g. Booking a Call).<br><br><b>How We Use Your Information</b><br>We use the information we collect in various ways, including to:<br>• Provide, operate, and maintain our website<br>• Improve, personalize, and expand our website<br>• Understand and analyze how you use our website<br>• Develop new products, services, features, and functionality<br>• Communicate with you, either directly or through one of our partners.`
+      content: `At AlgoGrowthHub, accessible from our website, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by AlgoGrowthHub and how we use it.<br><br><b>Information We Collect</b><br>The personal information that you are asked to provide, and the reasons why you are asked to provide it, will be made clear to you at the point we ask you to provide your personal information (e.g. Booking a Call).<br><br><b>How We Use Your Information</b><br>We use the information we collect in various ways, including to:<br>• Provide, operate, and maintain our website<br>• Improve, personalize, and expand our website<br>• Understand and analyze how you use our website<br>• Develop new products, services, features, and functionality<br>• Communicate with you, either directly or through one of our partners.`
     },
     terms: {
       title: "Terms & Conditions",
-      content: `Welcome to AlgoGrowth Hub! These terms and conditions outline the rules and regulations for the use of AlgoGrowth Hub's Website.<br><br>By accessing this website we assume you accept these terms and conditions. Do not continue to use AlgoGrowth Hub if you do not agree to take all of the terms and conditions stated on this page.<br><br><b>Service Bookings</b><br>By booking a session or downloading resources on this website, you agree to provide accurate registration details. We reserve the right to cancel bookings that fail to satisfy commitment payment verifications.<br><br><b>Intellectual Property</b><br>Unless otherwise stated, AlgoGrowth Hub and/or its licensors own the intellectual property rights for all material on AlgoGrowth Hub. All intellectual property rights are reserved.`
+      content: `Welcome to AlgoGrowthHub! These terms and conditions outline the rules and regulations for the use of AlgoGrowthHub's Website.<br><br>By accessing this website we assume you accept these terms and conditions. Do not continue to use AlgoGrowthHub if you do not agree to take all of the terms and conditions stated on this page.<br><br><b>Service Bookings</b><br>By booking a session or downloading resources on this website, you agree to provide accurate registration details. We reserve the right to cancel bookings that fail to satisfy commitment payment verifications.<br><br><b>Intellectual Property</b><br>Unless otherwise stated, AlgoGrowthHub and/or its licensors own the intellectual property rights for all material on AlgoGrowthHub. All intellectual property rights are reserved.`
     },
     refund: {
       title: "Refund Policy",
@@ -141,7 +167,7 @@ const websiteData = {
   },
   footer: {
     tagline: "Building a creator ecosystem that prioritises execution over noise.",
-    copyright: "© 2026 AlgoGrowth Hub. Founded by ALGOWINNER01. All rights reserved."
+    copyright: "© 2026 AlgoGrowthHub. Founded by ALGOWINNER01. All rights reserved."
   }
 };
 

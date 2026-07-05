@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AlgoGrowth Hub - Build. Grow. Monetize.</title>
+  <title>AlgoGrowthHub - Structure. Serve. Scale.</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,12 +63,35 @@
             <strong class="upi-value" id="fee-val">₹50</strong>
           </div>
         </div>
+        <div style="display: flex; flex-direction: column; align-items: center; margin: 1.5rem 0 1rem 0; gap: 0.5rem;">
+          <a id="upi-qr-link" href="#" style="display: block;">
+            <img id="upi-qr-img" src="" alt="Scan or Tap to Pay" style="border-radius: 12px; border: 3px solid var(--border-color); width: 160px; height: 160px; display: block; background: #ffffff; padding: 8px;">
+          </a>
+          <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-mobile-screen-button"></i> Scan QR or Tap on Mobile to pay</span>
+        </div>
         <p class="modal-note"><i class="fa-solid fa-circle-info"></i> After completing the payment, click the button below. This will compose the booking confirmation email to our team for quick slot validation.</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" onclick="proceedToEmail()" style="width: 100%;">
           Confirm Payment & Send Email <i class="fa-solid fa-paper-plane"></i>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resource Files Modal -->
+  <div id="resource-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closeResourceModal()" aria-label="Close modal">&times;</button>
+      <div class="modal-header">
+        <span class="badge" id="resource-modal-badge">Free Resource</span>
+        <h2 id="resource-modal-title">Resource Title</h2>
+      </div>
+      <div class="modal-body">
+        <p id="resource-modal-desc" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;"></p>
+        <div id="resource-files-list" style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Dynamic Files List goes here -->
+        </div>
       </div>
     </div>
   </div>

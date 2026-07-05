@@ -1,5 +1,5 @@
 /* ==========================================================================
-   AlgoGrowth Hub - JavaScript Engine (CSS-Only Visuals & Interactive Modals)
+   AlgoGrowthHub - JavaScript Engine (CSS-Only Visuals & Interactive Modals)
    ========================================================================== */
 
 // Temporary storage for current booking info
@@ -134,11 +134,20 @@ function renderHero() {
   const section = document.getElementById("home");
   const data = websiteData.hero;
 
+  const titleParts = (data.title || "Build. Grow. Monetize.")
+    .trim()
+    .replace(/[\.\•\s]+$/, "")
+    .split(/\s*[\.\•]\s*/);
+  
+  const part1 = titleParts[0] ? titleParts[0] + "." : "Build.";
+  const part2 = titleParts[1] ? titleParts[1] + "." : "Grow.";
+  const part3 = titleParts[2] ? titleParts[2] + "." : "Monetize.";
+
   section.innerHTML = `
     <div class="container">
       <div class="hero-grid">
         <div class="hero-content">
-          <h1>Build.<br>Grow.<br><span class="grad-text">${data.title.split('. ')[2] || 'Monetize.'}</span></h1>
+          <h1>${part1}<br>${part2}<br><span class="grad-text">${part3}</span></h1>
           <p class="hero-desc">${data.description}</p>
           <div class="hero-quote">"${data.quote}"</div>
           <div class="hero-ctas">
@@ -258,15 +267,17 @@ function renderResources() {
   const data = websiteData.resources;
 
   const cardsHtml = data.list
-    .map(res => `
-      <div class="resource-card">
-        <div class="resource-info">
-          <h3>${res.title}</h3>
-          <p>${res.description}</p>
+    .map((res, index) => {
+      return `
+        <div class="resource-card">
+          <div class="resource-info">
+            <h3>${res.title}</h3>
+            <p>${res.description}</p>
+          </div>
+          <a href="javascript:void(0)" onclick="openResourceModal('free', ${index})" class="btn-link">View Resources <i class="fa-solid fa-arrow-right-long"></i></a>
         </div>
-        <a href="#booking" class="btn-link">Download Free <i class="fa-solid fa-arrow-right-long"></i></a>
-      </div>
-    `)
+      `;
+    })
     .join("");
 
   section.innerHTML = `
@@ -282,12 +293,114 @@ function renderResources() {
       
       <div class="premium-resources-box">
         <span class="badge">Premium Resource</span>
-        <h3 style="margin-top: 1rem;">${data.premiumLink.text}</h3>
-        <p>${data.premiumLink.description}</p>
-        <a href="${data.premiumLink.href}" class="btn btn-primary">Request Access <i class="fa-solid fa-unlock-keyhole"></i></a>
+        <h3 style="margin-top: 1rem;">${data.premium.text}</h3>
+        <p>${data.premium.description}</p>
+        <a href="javascript:void(0)" onclick="openResourceModal('premium', 0)" class="btn btn-primary">View Resources <i class="fa-solid fa-unlock-keyhole"></i></a>
       </div>
     </div>
   `;
+
+  // Close modal when clicking on the overlay background
+  const resourceModal = document.getElementById("resource-modal");
+  if (resourceModal) {
+    resourceModal.addEventListener("click", (e) => {
+      if (e.target === resourceModal) {
+        closeResourceModal();
+      }
+    });
+  }
+}
+
+function openResourceModal(type, index) {
+  const modal = document.getElementById("resource-modal");
+  const modalBadge = document.getElementById("resource-modal-badge");
+  const modalTitle = document.getElementById("resource-modal-title");
+  const modalDesc = document.getElementById("resource-modal-desc");
+  const filesList = document.getElementById("resource-files-list");
+
+  if (!modal || !modalTitle || !modalDesc || !filesList) return;
+
+  let title = "";
+  let description = "";
+  let files = [];
+  const isPremium = (type === 'premium');
+
+  if (isPremium) {
+    const data = websiteData.resources.premium;
+    title = data.text;
+    description = data.description;
+    files = data.files || [];
+    modalBadge.textContent = "Premium Resource";
+  } else {
+    const res = websiteData.resources.list[index];
+    if (!res) return;
+    title = res.title;
+    description = res.description;
+    files = res.files || [];
+    modalBadge.textContent = "Free Resource";
+  }
+
+  modalTitle.textContent = title;
+  modalDesc.textContent = description;
+
+  // Render files list
+  filesList.innerHTML = files.map(file => {
+    if (file.locked) {
+      return `
+        <div class="resource-file-row">
+          <div class="resource-file-info">
+            <i class="fa-solid fa-lock" style="color: var(--accent-color);"></i>
+            <div>
+              <span class="resource-file-title">${file.name}</span>
+              <span class="resource-file-meta">Premium Blueprint (Locked)</span>
+            </div>
+          </div>
+          <div class="resource-file-actions">
+            <a href="javascript:void(0)" onclick="requestPremiumAccess()" class="btn btn-primary">
+              <i class="fa-solid fa-unlock-keyhole"></i> Request Access
+            </a>
+          </div>
+        </div>
+      `;
+    } else {
+      return `
+        <div class="resource-file-row">
+          <div class="resource-file-info">
+            <i class="fa-solid fa-file-pdf"></i>
+            <div>
+              <span class="resource-file-title">${file.name}</span>
+              <span class="resource-file-meta">PDF Document</span>
+            </div>
+          </div>
+          <div class="resource-file-actions">
+            <a href="${file.path}" target="_blank" class="btn btn-outline">
+              <i class="fa-solid fa-eye"></i> View
+            </a>
+            <a href="${file.path}" download class="btn btn-primary">
+              <i class="fa-solid fa-download"></i> Download
+            </a>
+          </div>
+        </div>
+      `;
+    }
+  }).join("");
+
+  modal.classList.add("active");
+}
+
+function closeResourceModal() {
+  const modal = document.getElementById("resource-modal");
+  if (modal) {
+    modal.classList.remove("active");
+  }
+}
+
+function requestPremiumAccess() {
+  closeResourceModal();
+  const bookingSec = document.getElementById("booking");
+  if (bookingSec) {
+    bookingSec.scrollIntoView({ behavior: "smooth" });
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -308,7 +421,7 @@ function renderCommunity() {
             <i class="fa-brands fa-telegram"></i> Join Telegram Channel
           </a>
           <a href="${data.whatsappLink}" target="_blank" class="btn btn-outline">
-            <i class="fa-brands fa-whatsapp"></i> WhatsApp Community
+            <i class="fa-brands fa-whatsapp"></i> Apply Here
           </a>
         </div>
       </div>
@@ -470,6 +583,21 @@ function handleBookingSubmit(event) {
 }
 
 function openPaymentModal() {
+  const data = websiteData.booking;
+  const upiId = data.upiId || "algowinner01official@okaxis";
+  const fee = data.fee || "49";
+  
+  // Create standard UPI payment URI
+  const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=AlgoGrowthHub&am=${encodeURIComponent(fee)}&cu=INR&tn=Booking%20Commitment%20Fee`;
+  
+  // Use a reliable QR Code generator API (api.qrserver.com)
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+  
+  const qrImg = document.getElementById("upi-qr-img");
+  const qrLink = document.getElementById("upi-qr-link");
+  if (qrImg) qrImg.src = qrUrl;
+  if (qrLink) qrLink.href = upiLink;
+
   document.getElementById("payment-modal").classList.add("active");
 }
 
@@ -481,7 +609,7 @@ function proceedToEmail() {
   if (!currentBookingData) return;
 
   const data = websiteData.booking;
-  const subject = encodeURIComponent(`[AlgoGrowth Hub] Call Booked by ${currentBookingData.name}`);
+  const subject = encodeURIComponent(`[AlgoGrowthHub] Call Booked by ${currentBookingData.name}`);
   
   const bodyText = `Hi ALGOWINNER01,
 
@@ -647,5 +775,7 @@ window.closePaymentModal = closePaymentModal;
 window.proceedToEmail = proceedToEmail;
 window.showPolicy = showPolicy;
 window.closePolicyModal = closePolicyModal;
-window.slideCreators = slideCreators;
 window.setupChartTracker = setupChartTracker;
+window.openResourceModal = openResourceModal;
+window.closeResourceModal = closeResourceModal;
+window.requestPremiumAccess = requestPremiumAccess;

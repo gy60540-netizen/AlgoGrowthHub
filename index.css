@@ -1,5 +1,5 @@
 /* ==========================================================================
-   AlgoGrowth Hub - Premium Responsive Stylesheet (CSS-Only Visuals)
+   AlgoGrowthHub - Premium Responsive Stylesheet (CSS-Only Visuals)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -1409,6 +1409,77 @@ body.light-mode .modal-overlay {
 .policy-scrollable::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 99px;
+}
+
+/* Resource Files Modal Styles */
+.resource-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(131, 122, 182, 0.03);
+  border: 1px solid var(--border-color);
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+}
+
+body.light-mode .resource-file-row {
+  background: rgba(124, 58, 237, 0.02);
+}
+
+.resource-file-row:hover {
+  background: rgba(131, 122, 182, 0.08);
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+body.light-mode .resource-file-row:hover {
+  background: rgba(124, 58, 237, 0.06);
+}
+
+.resource-file-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.resource-file-info i {
+  color: var(--accent-color);
+  font-size: 1.75rem;
+  transition: transform 0.3s ease;
+}
+
+.resource-file-row:hover .resource-file-info i {
+  transform: scale(1.1);
+}
+
+.resource-file-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: block;
+  color: var(--text-main);
+  text-align: left;
+}
+
+.resource-file-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: block;
+  text-align: left;
+}
+
+.resource-file-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.resource-file-actions .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  border-radius: 10px;
+  gap: 0.25rem;
+  font-weight: 500;
 }
 
 /* --------------------------------------------------------------------------
