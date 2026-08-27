@@ -1,0 +1,241 @@
+import mongoose, { Schema, Document } from 'mongoose';
+
+export interface ISiteSettings extends Document {
+  agencyName: string;
+  logo: {
+    url: string;
+    altText?: string;
+  };
+  hero: {
+    heading: string;
+    description: string;
+    primaryCta: string;
+    primaryCtaUrl: string;
+    secondaryCta: string;
+    secondaryCtaUrl: string;
+    heroImage: string;
+    floatingMetrics: Array<{
+      icon: string;
+      value: string;
+      label: string;
+    }>;
+  };
+  about: {
+    sectionLabel: string;
+    heading: string;
+    description: string;
+    features: string[];
+    metricLabel: string;
+    metricValue: string;
+    ctaLabel: string;
+    ctaUrl: string;
+    images: string[];
+  };
+  whyChooseUs: {
+    sectionLabel: string;
+    heading: string;
+    description: string;
+    primaryImage: string;
+    secondaryImage?: string;
+    platforms: Array<{
+      platform: 'Facebook' | 'Telegram' | 'Instagram' | 'LinkedIn';
+      metric: string;
+      label: string;
+      icon: string;
+      enabled: boolean;
+      order: number;
+    }>;
+  };
+  bookingSection: {
+    sectionHeading: string;
+    description: string;
+    image: string;
+    availableServices: string[];
+  };
+  letsWorkWithUs: {
+    heading: string;
+    description: string;
+    ctaLabel: string;
+    ctaUrl: string;
+    image: string;
+  };
+  footer: {
+    description: string;
+    email: string;
+    mobile: string;
+    instagramUrl: string;
+    twitterUrl: string;
+    telegramUrl: string;
+    copyrightText: string;
+  };
+  seoDefaults: {
+    title: string;
+    description: string;
+    ogImage?: string;
+    keywords?: string[];
+  };
+  updatedAt: Date;
+}
+
+const siteSettingsSchema = new Schema<ISiteSettings>(
+  {
+    agencyName: { type: String, default: 'AlgoGrowthHub' },
+    logo: {
+      url: { type: String, default: '/assets/logo.svg' },
+      altText: { type: String, default: 'AlgoGrowthHub Logo' },
+    },
+    hero: {
+      heading: { type: String, default: 'Transforming Business Through Strategic Social Growth' },
+      description: {
+        type: String,
+        default:
+          'We scale brands and creators with data-driven social media management, targeted short-form content, and high-impact growth campaigns.',
+      },
+      primaryCta: { type: String, default: 'Book a Call Session' },
+      primaryCtaUrl: { type: String, default: '/book-session' },
+      secondaryCta: { type: String, default: 'Learn More' },
+      secondaryCtaUrl: { type: String, default: '/about' },
+      heroImage: { type: String, default: '/assets/hero-mockup.png' },
+      floatingMetrics: [
+        {
+          icon: { type: String, default: 'instagram' },
+          value: { type: String, default: '10M+' },
+          label: { type: String, default: 'Monthly Impressions' },
+        },
+        {
+          icon: { type: String, default: 'trending-up' },
+          value: { type: String, default: '350%' },
+          label: { type: String, default: 'Average ROI' },
+        },
+      ],
+    },
+    about: {
+      sectionLabel: { type: String, default: 'About AlgoGrowthHub' },
+      heading: { type: String, default: 'Transforming Business Through Social Media' },
+      description: {
+        type: String,
+        default:
+          'We engineer social presence into predictable pipeline. Our tailored strategies fuse viral storytelling with technical audience acquisition.',
+      },
+      features: {
+        type: [String],
+        default: [
+          'Algorithmic content optimization for multi-platform distribution',
+          'Data-backed audience acquisition and engagement loops',
+          'High-converting social funnel architecture and creator networks',
+        ],
+      },
+      metricLabel: { type: String, default: 'Total Creator Reach' },
+      metricValue: { type: String, default: '25M+' },
+      ctaLabel: { type: String, default: 'Learn More' },
+      ctaUrl: { type: String, default: '/about' },
+      images: { type: [String], default: ['/assets/about-main.png'] },
+    },
+    whyChooseUs: {
+      sectionLabel: { type: String, default: 'Why Choose Us' },
+      heading: { type: String, default: 'Your Success, Our Priority' },
+      description: {
+        type: String,
+        default:
+          'We deliver transparent analytics and measurable revenue impact across the four most vital growth channels.',
+      },
+      primaryImage: { type: String, default: '/assets/why-choose-us.png' },
+      secondaryImage: { type: String },
+      platforms: [
+        {
+          platform: { type: String, enum: ['Facebook', 'Telegram', 'Instagram', 'LinkedIn'] },
+          metric: { type: String, default: '500K+' },
+          label: { type: String, default: 'Community Reach' },
+          icon: { type: String, default: 'facebook' },
+          enabled: { type: Boolean, default: true },
+          order: { type: Number, default: 1 },
+        },
+        {
+          platform: { type: String, enum: ['Facebook', 'Telegram', 'Instagram', 'LinkedIn'] },
+          metric: { type: String, default: '120K+' },
+          label: { type: String, default: 'Subscribers' },
+          icon: { type: String, default: 'telegram' },
+          enabled: { type: Boolean, default: true },
+          order: { type: Number, default: 2 },
+        },
+        {
+          platform: { type: String, enum: ['Facebook', 'Telegram', 'Instagram', 'LinkedIn'] },
+          metric: { type: String, default: '2.5M+' },
+          label: { type: String, default: 'Viral Views' },
+          icon: { type: String, default: 'instagram' },
+          enabled: { type: Boolean, default: true },
+          order: { type: Number, default: 3 },
+        },
+        {
+          platform: { type: String, enum: ['Facebook', 'Telegram', 'Instagram', 'LinkedIn'] },
+          metric: { type: String, default: '85K+' },
+          label: { type: String, default: 'B2B Connections' },
+          icon: { type: String, default: 'linkedin' },
+          enabled: { type: Boolean, default: true },
+          order: { type: Number, default: 4 },
+        },
+      ],
+    },
+    bookingSection: {
+      sectionHeading: { type: String, default: 'Book a 1-on-1 Growth Strategy Session' },
+      description: {
+        type: String,
+        default:
+          'Get a custom breakdown of your current social channels and a 90-day actionable scaling roadmap tailored to your industry.',
+      },
+      image: { type: String, default: '/assets/booking-visual.png' },
+      availableServices: {
+        type: [String],
+        default: [
+          'Full-Service Social Media Management',
+          'Instagram & Reels Viral Growth',
+          'Creator Community & Influencer Marketing',
+          'B2B LinkedIn Brand Strategy',
+          'Paid Performance Campaigns',
+        ],
+      },
+    },
+    letsWorkWithUs: {
+      heading: { type: String, default: "Ready to Scale? Let's Work Together." },
+      description: {
+        type: String,
+        default:
+          'Join over 150+ brands and creators dominating their digital space with AlgoGrowthHub.',
+      },
+      ctaLabel: { type: String, default: 'Book a Call Session →' },
+      ctaUrl: { type: String, default: '/book-session' },
+      image: { type: String, default: '/assets/cta-banner.png' },
+    },
+    footer: {
+      description: {
+        type: String,
+        default:
+          'AlgoGrowthHub is a premier digital growth agency specializing in high-performance social media architecture, creator community scaling, and revenue conversion.',
+      },
+      email: { type: String, default: 'hello@algogrowthhub.com' },
+      mobile: { type: String, default: '+91 98765 43210' },
+      instagramUrl: { type: String, default: 'https://instagram.com/algogrowthhub' },
+      twitterUrl: { type: String, default: 'https://x.com/algogrowthhub' },
+      telegramUrl: { type: String, default: 'https://t.me/algogrowthhub' },
+      copyrightText: { type: String, default: '© 2026 AlgoGrowthHub. All rights reserved.' },
+    },
+    seoDefaults: {
+      title: { type: String, default: 'AlgoGrowthHub — Modern Social Media & Digital Growth Agency' },
+      description: {
+        type: String,
+        default:
+          'Transform your business through high-impact social media management, viral reels strategy, creator community partnerships, and data-driven marketing.',
+      },
+      ogImage: { type: String, default: '/assets/og-image.jpg' },
+      keywords: {
+        type: [String],
+        default: ['social media agency', 'creator growth', 'instagram reels strategy', 'digital marketing'],
+      },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export const SiteSettings = mongoose.model<ISiteSettings>('SiteSettings', siteSettingsSchema);

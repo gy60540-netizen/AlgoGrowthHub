@@ -1,0 +1,84 @@
+# ==========================================
+# 1. Security & Environment Secrets (CRITICAL)
+# ==========================================
+.env
+.env.local
+.env.*.local
+*.env
+*.pem
+*.key
+*.cert
+*.pfx
+id_rsa*
+
+# ==========================================
+# 2. Agent & AI IDE Workspace Artifacts
+# ==========================================
+.agents/
+.agent/
+.gemini/
+.antigravity/
+.system_generated/
+*.system_generated
+
+# ==========================================
+# 3. Dependencies & Package Caches
+# ==========================================
+node_modules/
+*/node_modules/
+.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+.turbo/
+.cache/
+.vite/
+
+# ==========================================
+# 4. Production & Build Outputs
+# ==========================================
+dist/
+*/dist/
+build/
+*/build/
+out/
+.next/
+
+# ==========================================
+# 5. Uploads, Temp Files & User Media
+# ==========================================
+uploads/*
+!uploads/.gitkeep
+*/uploads/*
+!*/uploads/.gitkeep
+temp/
+tmp/
+
+# ==========================================
+# 6. Logs & Debugging
+# ==========================================
+logs/
+*.log
+
+# ==========================================
+# 7. Testing & Coverage Reports
+# ==========================================
+coverage/
+.nyc_output/
+*.lcov
+
+# ==========================================
+# 8. IDE & Operating System Files
+# ==========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
