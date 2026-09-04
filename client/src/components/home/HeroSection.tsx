@@ -157,9 +157,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             background-size: cover !important;
             background-position: center bottom !important;
             background-repeat: no-repeat !important;
-            min-height: 725px !important;
-            height: 725px !important;
-            max-height: 725px !important;
+            min-height: 580px !important;
+            height: auto !important;
+            max-height: 640px !important;
             padding-top: 0 !important;
             padding-bottom: 0 !important;
             display: flex !important;
@@ -173,8 +173,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
           }
 
           .hero-content-container {
-            padding-top: 66px !important;
-            max-width: 90% !important;
+            padding-top: 76px !important;
+            max-width: 92% !important;
             margin: 0 auto !important;
             display: flex !important;
             flex-direction: column !important;
@@ -183,17 +183,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
           }
 
           .hero-main-heading {
-            font-size: clamp(1.28rem, 4.8vw, 1.55rem) !important;
-            margin-bottom: 0.25rem !important;
-            line-height: 1.15 !important;
+            font-size: clamp(1.38rem, 5.2vw, 1.7rem) !important;
+            margin-bottom: 0.4rem !important;
+            line-height: 1.18 !important;
             text-align: center !important;
           }
 
           .hero-subtext {
-            font-size: 0.76rem !important;
-            line-height: 1.32 !important;
-            margin-bottom: 0.55rem !important;
-            max-width: 290px !important;
+            font-size: 0.82rem !important;
+            line-height: 1.38 !important;
+            margin-bottom: 0.75rem !important;
+            max-width: 310px !important;
             text-align: center !important;
           }
 
@@ -201,16 +201,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 0.4rem !important;
+            gap: 0.5rem !important;
             width: 100% !important;
-            max-width: 220px !important;
+            max-width: 230px !important;
             margin: 0 auto !important;
           }
 
           .hero-btn-primary, .hero-btn-secondary {
             width: 100% !important;
-            padding: 0.48rem 1rem !important;
-            font-size: 0.8rem !important;
+            padding: 0.58rem 1.15rem !important;
+            font-size: 0.84rem !important;
             border-radius: 9999px !important;
           }
 

@@ -84,11 +84,14 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
             gridTemplateColumns: '1fr',
             gap: '3.5rem',
             alignItems: 'flex-start',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
           }}
           className="creator-apply-grid"
         >
           {/* Left Column: Form & Pitch */}
-          <div>
+          <div className="creator-form-col" style={{ minWidth: 0, width: '100%', maxWidth: '100%' }}>
             <div className="section-badge" style={{ marginBottom: '1rem' }}>
               <Sparkles size={14} />
               <span>FOR CREATORS</span>
@@ -145,9 +148,9 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
               </div>
             )}
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                <div>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', width: '100%', maxWidth: '100%' }}>
+              <div className="creator-form-row">
+                <div style={{ minWidth: 0, width: '100%' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.4rem' }}>
                     Creator Name / Full Name *
                   </label>
@@ -159,6 +162,8 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     style={{
                       width: '100%',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.8rem 1rem',
                       borderRadius: '10px',
                       border: '1px solid var(--color-border)',
@@ -168,7 +173,7 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                   />
                 </div>
 
-                <div>
+                <div style={{ minWidth: 0, width: '100%' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.4rem' }}>
                     Email Address *
                   </label>
@@ -180,6 +185,8 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     style={{
                       width: '100%',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.8rem 1rem',
                       borderRadius: '10px',
                       border: '1px solid var(--color-border)',
@@ -190,8 +197,8 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                <div>
+              <div className="creator-form-row">
+                <div style={{ minWidth: 0, width: '100%' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.4rem' }}>
                     Mobile / WhatsApp Number *
                   </label>
@@ -203,6 +210,8 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     style={{
                       width: '100%',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.8rem 1rem',
                       borderRadius: '10px',
                       border: '1px solid var(--color-border)',
@@ -212,16 +221,18 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                   />
                 </div>
 
-                <div>
+                <div style={{ minWidth: 0, width: '100%' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.4rem' }}>
                     Primary Social Platform *
                   </label>
-                  <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'relative', width: '100%' }}>
                     <select
                       value={formData.platform}
                       onChange={(e) => setFormData({ ...formData, platform: e.target.value as any })}
                       style={{
                         width: '100%',
+                        maxWidth: '100%',
+                        boxSizing: 'border-box',
                         padding: '0.8rem 1rem 0.8rem 2.4rem',
                         borderRadius: '10px',
                         border: '1px solid var(--color-border)',
@@ -242,8 +253,8 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                <div>
+              <div className="creator-form-row">
+                <div style={{ minWidth: 0, width: '100%' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.4rem' }}>
                     Social Profile Link / Handle *
                   </label>
@@ -255,6 +266,8 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                     onChange={(e) => setFormData({ ...formData, socialLink: e.target.value })}
                     style={{
                       width: '100%',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.8rem 1rem',
                       borderRadius: '10px',
                       border: '1px solid var(--color-border)',
@@ -264,7 +277,7 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                   />
                 </div>
 
-                <div>
+                <div style={{ minWidth: 0, width: '100%' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.4rem' }}>
                     Audience Size
                   </label>
@@ -273,6 +286,8 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                     onChange={(e) => setFormData({ ...formData, followerCount: e.target.value })}
                     style={{
                       width: '100%',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
                       padding: '0.8rem 1rem',
                       borderRadius: '10px',
                       border: '1px solid var(--color-border)',
@@ -295,6 +310,8 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                 className="btn btn-primary"
                 style={{
                   width: '100%',
+                  maxWidth: '100%',
+                  boxSizing: 'border-box',
                   padding: '1rem',
                   fontSize: '1.02rem',
                   fontWeight: 800,
@@ -309,7 +326,7 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
           </div>
 
           {/* Right Column: Perks & Creator Ecosystem Highlights */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem', minWidth: 0, width: '100%', maxWidth: '100%' }}>
             {[
               {
                 title: "Brand Collaborations",
@@ -342,11 +359,15 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
             ].map((perk, i) => (
               <div
                 key={i}
+                className="perk-card-box"
                 style={{
                   backgroundColor: '#F8FAFC',
                   padding: '1.35rem 1.5rem',
                   borderRadius: '20px',
                   border: '1px solid rgba(226, 232, 240, 0.8)',
+                  boxSizing: 'border-box',
+                  width: '100%',
+                  maxWidth: '100%',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '0.45rem' }}>
@@ -369,7 +390,7 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
                     {perk.title}
                   </h4>
                 </div>
-                <p style={{ fontSize: '0.88rem', lineHeight: 1.55, color: '#64748B', margin: 0, paddingLeft: '3.25rem' }}>
+                <p className="perk-card-desc" style={{ fontSize: '0.88rem', lineHeight: 1.55, color: '#64748B', margin: 0, paddingLeft: '3.25rem' }}>
                   {perk.desc}
                 </p>
               </div>
@@ -379,14 +400,36 @@ export const WorkWithUsSection: React.FC<WorkWithUsSectionProps> = ({ settings }
       </div>
 
       <style>{`
+        .creator-form-row {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+          width: 100%;
+          min-width: 0;
+        }
+
         @media (min-width: 992px) {
           .creator-apply-grid {
             grid-template-columns: 1.15fr 0.85fr !important;
           }
         }
-        @media (max-width: 640px) {
+
+        @media (max-width: 768px) {
+          .creator-form-row {
+            grid-template-columns: 1fr !important;
+            gap: 0.9rem !important;
+          }
           .creator-apply-grid {
-            padding: 2rem 1.5rem !important;
+            padding: 1.75rem 1.15rem !important;
+            border-radius: 20px !important;
+            gap: 2.25rem !important;
+          }
+          .perk-card-box {
+            padding: 1.15rem 1rem !important;
+          }
+          .perk-card-desc {
+            padding-left: 0 !important;
+            margin-top: 0.35rem !important;
           }
         }
       `}</style>
