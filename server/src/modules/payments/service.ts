@@ -5,6 +5,8 @@ import { getPaymentProvider } from './provider.js';
 import { AppError } from '../../utils/AppError.js';
 import { ORDER_STATUS } from '../../config/constants.js';
 
+import { env } from '../../config/env.js';
+
 export class PaymentService {
   public static async initiateCheckout(data: {
     resourceId: string;
@@ -17,6 +19,7 @@ export class PaymentService {
     amount: number;
     currency: string;
     provider: string;
+    keyId?: string;
     clientSecret?: string;
   }> {
     const resource = await Resource.findById(data.resourceId);
@@ -63,6 +66,7 @@ export class PaymentService {
       amount: order.amount,
       currency: order.currency,
       provider: order.provider,
+      keyId: env.RAZORPAY_KEY_ID || '',
       clientSecret: providerResult.clientSecret,
     };
   }

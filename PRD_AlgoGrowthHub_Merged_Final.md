@@ -1,3 +1,49 @@
+bhai screen shot toh le liye ab go and check prd [PRD_AlgoGrowthHub_Merged_Final.md](file;file:///c%3A/CHATBOT/AlgoGrowthHub/PRD_AlgoGrowthHub_Merged_Final.md) and implement my frontend again as given in prd and forn size css style Section 01: Hero                                  → #FFFFFF
+Section 02: About                                 → #F4F8FC
+Section 03: Power Services (3×3 Grid)             → #FFFFFF
+Section 04: Why Choose Us (4 Platform Cards)      → #F4F8FC
+Section 05: Creator Community (Instagram ONLY)    → #FFFFFF
+Section 06: Meet Our Expert Team (Insta+LinkedIn) → #F4F8FC
+Section 07: Client Results (Before/After)         → #FFFFFF
+Section 08: Resources (Free/Premium Playbooks)    → #F4F8FC
+Section 09: Book a Call Session                   → #FFFFFF
+Section 10: Let's Work With Us                    → #F4F8FC
+Section 11: Footer (Screenshot Dark Theme)        → #                              1. Master Typography Scale & Specifications (PRD Section 5):
+Font Families:
+
+Headings & Badges & Buttons: 'Plus Jakarta Sans', sans-serif (Modern geometric sans).
+Body & Metadata: 'Inter', sans-serif (High-legibility reading typeface).
+Hierarchy & Exact CSS Tokens:
+
+Hero Main Heading:
+font-size: clamp(2.5rem, 5vw, 4rem) (40px–64px)
+font-weight: 900 (Black)
+line-height: 1.15
+letter-spacing: -0.03em
+Section Headings:
+font-size: clamp(2rem, 3.8vw, 2.75rem) (32px–44px)
+font-weight: 800 (ExtraBold)
+line-height: 1.2
+letter-spacing: -0.025em
+Card Headings / Service Titles:
+font-size: 1.25rem (20px)
+font-weight: 800 (ExtraBold)
+line-height: 1.35
+letter-spacing: -0.015em
+Body & Paragraphs:
+font-size: 1rem - 1.05rem (16px–17px)
+font-weight: 400 / 500
+line-height: 1.7
+color: #475569
+Badges & Labels:
+font-size: 0.8rem (12.8px)
+font-weight: 700 (Bold)
+text-transform: uppercase
+letter-spacing: +0.08em
+CTA Buttons:
+font-size: 0.95rem (15.2px)
+font-weight: 700 (Bold)
+letter-spacing: +0.01em[heroImg.png](file;file:///c%3A/CHATBOT/AlgoGrowthHub/heroImg.png)  use this as hero image as background and handle the navigatin and buttons  jo iss image ke upar hona chahiye and  [logo.png](file;file:///c%3A/CHATBOT/AlgoGrowthHub/logo.png) use this for logo please prd koo acche se analyze karakr hi frontend ko banao back groundcolor jaisa maine bola hai vaisa hi rakho now check the prd and build according to this file please rebuild fontend  isako implementation kar 
 **# AlgoGrowthHub — Master Full-Stack Build PRD**
 
 **\*\*Production-Grade Full-Stack Social Media Agency Website\*\***

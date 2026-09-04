@@ -9,6 +9,23 @@ export const updateSiteSettingsSchema = z.object({
         altText: z.string().optional(),
       })
       .optional(),
+    theme: z
+      .object({
+        preset: z.string().optional(),
+        primaryColor: z.string().optional(),
+        primaryHover: z.string().optional(),
+        secondaryColor: z.string().optional(),
+        accentColor: z.string().optional(),
+        backgroundLight: z.string().optional(),
+        backgroundSoft: z.string().optional(),
+        backgroundDark: z.string().optional(),
+        surfaceCard: z.string().optional(),
+        textPrimary: z.string().optional(),
+        textSecondary: z.string().optional(),
+        borderRadius: z.string().optional(),
+        mode: z.enum(['light', 'dark', 'system']).optional(),
+      })
+      .optional(),
     hero: z
       .object({
         heading: z.string().optional(),

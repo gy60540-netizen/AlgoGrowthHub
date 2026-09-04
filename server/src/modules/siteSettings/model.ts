@@ -6,6 +6,21 @@ export interface ISiteSettings extends Document {
     url: string;
     altText?: string;
   };
+  theme?: {
+    preset: string;
+    primaryColor: string;
+    primaryHover: string;
+    secondaryColor: string;
+    accentColor: string;
+    backgroundLight: string;
+    backgroundSoft: string;
+    backgroundDark: string;
+    surfaceCard: string;
+    textPrimary: string;
+    textSecondary: string;
+    borderRadius: string;
+    mode: 'light' | 'dark' | 'system';
+  };
   hero: {
     heading: string;
     description: string;
@@ -81,21 +96,36 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
   {
     agencyName: { type: String, default: 'AlgoGrowthHub' },
     logo: {
-      url: { type: String, default: '/assets/logo.svg' },
+      url: { type: String, default: '/assets/logo.png' },
       altText: { type: String, default: 'AlgoGrowthHub Logo' },
     },
+    theme: {
+      preset: { type: String, default: 'Royal Blue' },
+      primaryColor: { type: String, default: '#2563EB' },
+      primaryHover: { type: String, default: '#1D4ED8' },
+      secondaryColor: { type: String, default: '#38BDF8' },
+      accentColor: { type: String, default: '#0284C7' },
+      backgroundLight: { type: String, default: '#FFFFFF' },
+      backgroundSoft: { type: String, default: '#F4F8FC' },
+      backgroundDark: { type: String, default: '#090D16' },
+      surfaceCard: { type: String, default: '#FFFFFF' },
+      textPrimary: { type: String, default: '#0F172A' },
+      textSecondary: { type: String, default: '#475569' },
+      borderRadius: { type: String, default: '9999px' },
+      mode: { type: String, enum: ['light', 'dark', 'system'], default: 'light' },
+    },
     hero: {
-      heading: { type: String, default: 'Transforming Business Through Strategic Social Growth' },
+      heading: { type: String, default: 'Elevate Your Brand With Social Media Excellence' },
       description: {
         type: String,
         default:
-          'We scale brands and creators with data-driven social media management, targeted short-form content, and high-impact growth campaigns.',
+          'We Help Your Brand Stand Out And Thrive In The Digital Landscape. From Engaging Content Creation To Targeted Ad Campaigns, We Are Here To Drive Your Success.',
       },
-      primaryCta: { type: String, default: 'Book a Call Session' },
-      primaryCtaUrl: { type: String, default: '/book-session' },
+      primaryCta: { type: String, default: 'Get Started Now' },
+      primaryCtaUrl: { type: String, default: '/#booking' },
       secondaryCta: { type: String, default: 'Learn More' },
-      secondaryCtaUrl: { type: String, default: '/about' },
-      heroImage: { type: String, default: '/assets/hero-mockup.png' },
+      secondaryCtaUrl: { type: String, default: '/#about' },
+      heroImage: { type: String, default: '/assets/heroImg.png' },
       floatingMetrics: [
         {
           icon: { type: String, default: 'instagram' },
@@ -181,17 +211,18 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
       description: {
         type: String,
         default:
-          'Get a custom breakdown of your current social channels and a 90-day actionable scaling roadmap tailored to your industry.',
+          'Have a question about growing your social media, designing better content, building your personal brand, or working with us? Book a session and let’s talk it through.',
       },
       image: { type: String, default: '/assets/booking-visual.png' },
       availableServices: {
         type: [String],
         default: [
-          'Full-Service Social Media Management',
-          'Instagram & Reels Viral Growth',
-          'Creator Community & Influencer Marketing',
-          'B2B LinkedIn Brand Strategy',
-          'Paid Performance Campaigns',
+          'Full Social Media Management',
+          'Carousal Design',
+          'Vedio Editing',
+          'Web Devolopment',
+          'Ai Agent Building',
+          'Digital Assets',
         ],
       },
     },

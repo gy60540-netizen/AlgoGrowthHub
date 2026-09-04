@@ -414,20 +414,31 @@ All responses follow a standard envelope:
 * **Auth:** Public
 
 **Response Data Structure:**
-Includes `hero`, `about`, `whyChooseUs`, `bookingSection`, `footer`, and `seo` metadata.
+Includes `agencyName`, `logo`, `theme` (preset, primaryColor, primaryHover, secondaryColor, accentColor, backgroundLight, backgroundSoft, backgroundDark, surfaceCard, textPrimary, textSecondary, borderRadius, mode), `hero`, `about`, `whyChooseUs`, `bookingSection`, `letsWorkWithUs`, `footer`, and `seoDefaults`.
 
-#### 3.2 Update Site Settings
+#### 3.2 Update Site Settings & Dynamic Theme
 * **Method:** `PUT`
 * **Route:** `/api/v1/admin/settings`
 * **Auth:** Admin / Super Admin
 
-**Request Body:**
+**Request Body Example:**
 ```json
 {
+  "theme": {
+    "preset": "Obsidian Gold",
+    "primaryColor": "#E5A93C",
+    "primaryHover": "#C88D25",
+    "secondaryColor": "#94A3B8",
+    "accentColor": "#F59E0B",
+    "backgroundDark": "#07080B",
+    "surfaceCard": "#13161F",
+    "textPrimary": "#F8FAFC",
+    "borderRadius": "12px",
+    "mode": "dark"
+  },
   "hero": {
-    "badgeText": "Top 1% Algorithmic Growth Agency",
-    "heading": "Scale Your Social Reach to 10M+",
-    "subheading": "Proven content frameworks and data science for creator dominance."
+    "heading": "Transforming Business Through Strategic Social Growth",
+    "description": "We scale brands and creators with data-driven social media management."
   }
 }
 ```
@@ -795,20 +806,69 @@ Chronological event log containing `actorUserId`, `action`, `resourceType`, `ipA
 
 ---
 
-## 9. Developer Roadmap: Where to Continue
+## 10. Leads & Creator Applications Pipeline (`/api/v1/leads`)
 
-Any developer joining this repository can continue from the following priority checkpoints:
+### A. Submit Creator Application / Inbound Lead
+* **Endpoint:** `POST /api/v1/leads`
+* **Access:** Public (Rate Limited)
+* **Request Body:**
+```json
+{
+  "name": "Aryan Sharma",
+  "email": "aryan@example.com",
+  "phone": "+91 98765 43210",
+  "platform": "Instagram",
+  "socialLink": "https://instagram.com/aryan.growth",
+  "followerCount": "50K - 150K",
+  "leadType": "CREATOR_APPLICATION",
+  "service": "Creator Collaboration (Instagram)",
+  "message": "Platform: Instagram | Link: https://instagram.com/aryan.growth | Followers: 50K - 150K"
+}
+```
+* **Success Response (`201 Created`):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "66ce8f91a2b3c4d5e6f7a8b9",
+    "name": "Aryan Sharma",
+    "email": "aryan@example.com",
+    "phone": "+91 98765 43210",
+    "platform": "Instagram",
+    "socialLink": "https://instagram.com/aryan.growth",
+    "followerCount": "50K - 150K",
+    "leadType": "CREATOR_APPLICATION",
+    "status": "NEW",
+    "createdAt": "2026-08-29T12:00:00.000Z"
+  }
+}
+```
 
-1. **Frontend Client Application (`client/`):**
-   * Connect React/Vite/Next.js frontend with Axios/TanStack Query.
-   * Point base URL to `http://localhost:5000/api/v1`.
-   * Configure Axios interceptor to automatically call `/api/v1/auth/refresh` on `401 AUTHENTICATION_ERROR`.
-2. **Production Webhook Integration:**
-   * Configure Razorpay Webhook endpoint (`/api/v1/payments/webhook/razorpay`) with secret verification.
-   * Configure Stripe Webhook endpoint (`/api/v1/payments/webhook/stripe`).
-   * Add Discord Notification Webhook URL in `.env` (`DISCORD_LEADS_WEBHOOK_URL`).
-3. **Cloud Storage Engine:**
-   * Provide Cloudinary or AWS S3 credentials in `.env` to switch from `STORAGE_PROVIDER=local` to `STORAGE_PROVIDER=cloudinary`.
+### B. Admin List All Leads / Creator Applications
+* **Endpoint:** `GET /api/v1/admin/leads?status=NEW`
+* **Access:** Protected (`Bearer JWT` + Super Admin / Admin)
+* **Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "data": {
+    "leads": [ ... ],
+    "pagination": { "page": 1, "limit": 20, "total": 1, "pages": 1 }
+  }
+}
+```
+
+### C. Admin Update Application Status
+* **Endpoint:** `PATCH /api/v1/admin/leads/:id/status`
+* **Access:** Protected (`Bearer JWT` + Super Admin / Admin)
+* **Request Body:**
+```json
+{
+  "status": "QUALIFIED"
+}
+```
+* **Status Enum Values:** `NEW`, `CONTACTED`, `QUALIFIED`, `PROPOSAL_SENT`, `WON`, `LOST`
 
 ---
 *AlgoGrowthHub Backend API Suite is verified, fully tested, and ready for production consumption.*
+
