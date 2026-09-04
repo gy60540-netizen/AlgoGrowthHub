@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, KeyRound } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const AdminLoginPage: React.FC = () => {
-  const [email, setEmail] = useState('admin@algogrowthhub.com');
-  const [password, setPassword] = useState('Admin@123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
@@ -28,12 +28,6 @@ export const AdminLoginPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFillSuperAdmin = () => {
-    setEmail('admin@algogrowthhub.com');
-    setPassword('Admin@123456');
-    setError('');
   };
 
   return (
@@ -82,44 +76,6 @@ export const AdminLoginPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Super Admin Credentials Quick-Fill Card */}
-        <div
-          style={{
-            backgroundColor: 'var(--color-primary-light)',
-            border: '1px solid rgba(31, 5, 229, 0.15)',
-            borderRadius: 'var(--radius-md)',
-            padding: '0.85rem 1rem',
-            marginBottom: '1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '0.5rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <KeyRound size={16} color="var(--color-primary)" />
-            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-primary)' }}>
-              <strong>Super Admin:</strong> admin@algogrowthhub.com
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleFillSuperAdmin}
-            style={{
-              background: 'var(--color-white)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '4px',
-              padding: '0.25rem 0.6rem',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              color: 'var(--color-primary)',
-              cursor: 'pointer',
-            }}
-          >
-            Auto-Fill
-          </button>
-        </div>
-
         {error && (
           <div
             style={{
@@ -149,7 +105,7 @@ export const AdminLoginPage: React.FC = () => {
               <input
                 type="email"
                 required
-                placeholder="admin@algogrowthhub.com"
+                placeholder="admin@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{

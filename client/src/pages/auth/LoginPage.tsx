@@ -20,7 +20,7 @@ export const LoginPage: React.FC = () => {
     setLoading(false);
 
     if (res.success) {
-      if (email === 'admin@algogrowthhub.com') {
+      if (res.user?.role === 'admin' || res.user?.role === 'superadmin') {
         navigate('/admin');
       } else {
         navigate('/');
@@ -28,11 +28,6 @@ export const LoginPage: React.FC = () => {
     } else {
       setError(res.message || 'Invalid email or password');
     }
-  };
-
-  const handleQuickAdmin = () => {
-    setEmail('admin@algogrowthhub.com');
-    setPassword('Admin@123456');
   };
 
   return (
@@ -161,23 +156,6 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        {/* Demo Admin Helper Button */}
-        <div style={{ marginTop: '1.25rem', textAlign: 'center' }}>
-          <button
-            type="button"
-            onClick={handleQuickAdmin}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--color-text-muted)',
-              fontSize: '0.78rem',
-              cursor: 'pointer',
-              textDecoration: 'underline',
-            }}
-          >
-            Fill Demo Super Admin Credentials
-          </button>
-        </div>
 
         {/* Switch to Signup */}
         <div style={{ marginTop: '1.75rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)', textAlign: 'center' }}>

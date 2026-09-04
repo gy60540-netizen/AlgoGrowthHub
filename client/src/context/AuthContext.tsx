@@ -14,7 +14,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; user?: User }>;
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
 }
@@ -60,18 +60,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('user', JSON.stringify(userData));
       }
 
-      return { success: true, message: res.data?.message || 'Login successful' };
+      return { success: true, message: res.data?.message || 'Login successful', user: userData };
     } catch (err: any) {
-      // Dev mode fallback for default Super Admin
-      if (email === 'admin@algogrowthhub.com' && password === 'Admin@123456') {
-        const mockUser: User = { name: 'Super Administrator', email, role: 'superadmin' };
-        setToken('dev-admin-token');
-        setUser(mockUser);
-        localStorage.setItem('token', 'dev-admin-token');
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        return { success: true, message: 'Logged in as Admin (Local Mode)' };
-      }
-
       return {
         success: false,
         message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Login failed',
