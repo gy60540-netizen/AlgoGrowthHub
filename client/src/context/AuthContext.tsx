@@ -6,7 +6,7 @@ export interface User {
   id?: string;
   name: string;
   email: string;
-  role: 'superadmin' | 'admin' | 'editor' | 'user';
+  role: 'superadmin' | 'admin' | 'editor' | 'user' | 'SUPER_ADMIN' | 'ADMIN' | 'USER' | string;
 }
 
 interface AuthContextType {
@@ -106,7 +106,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const isAuthenticated = !!token && !!user;
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const role = user?.role?.toUpperCase();
+  const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'SUPERADMIN';
 
   return (
     <AuthContext.Provider

@@ -20,7 +20,8 @@ export const LoginPage: React.FC = () => {
     setLoading(false);
 
     if (res.success) {
-      if (res.user?.role === 'admin' || res.user?.role === 'superadmin') {
+      const role = res.user?.role?.toUpperCase();
+      if (role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'SUPERADMIN') {
         navigate('/admin');
       } else {
         navigate('/');
