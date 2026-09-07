@@ -161,7 +161,7 @@ export const ExpertTeamSection: React.FC<ExpertTeamSectionProps> = ({ team }) =>
         {/* Explore All Team Link */}
         <div style={{ textAlign: 'center' }}>
           <Link to="/team" className="btn btn-secondary" style={{ padding: '0.85rem 2.25rem' }}>
-            <span>Explore Full Team & Roster</span>
+            <span>Experts</span>
             <ArrowRight size={16} />
           </Link>
         </div>

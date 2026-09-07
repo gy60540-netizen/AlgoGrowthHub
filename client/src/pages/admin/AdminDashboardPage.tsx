@@ -1093,6 +1093,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <th style={{ padding: '1rem 0.75rem', fontWeight: 800 }}>Contact</th>
                       <th style={{ padding: '1rem 0.75rem', fontWeight: 800 }}>Requested Service</th>
                       <th style={{ padding: '1rem 0.75rem', fontWeight: 800 }}>Preferred Schedule</th>
+                      <th style={{ padding: '1rem 0.75rem', fontWeight: 800 }}>Payment</th>
                       <th style={{ padding: '1rem 0.75rem', fontWeight: 800 }}>Notes / Message</th>
                       <th style={{ padding: '1rem 0.75rem', fontWeight: 800 }}>Status</th>
                     </tr>
@@ -1143,6 +1144,31 @@ export const AdminDashboardPage: React.FC = () => {
                             <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
                               <Clock size={12} />
                               <span>{b.preferredTime} ({b.timezone || 'IST'})</span>
+                            </div>
+                          </td>
+
+                          <td style={{ padding: '1rem 0.75rem' }}>
+                            <div style={{ display: 'inline-flex', flexDirection: 'column', gap: '0.25rem' }}>
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem',
+                                  padding: '0.25rem 0.65rem',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.78rem',
+                                  fontWeight: 800,
+                                  backgroundColor: (b.paymentStatus === 'PAID' || b.amount) && b.paymentStatus !== 'FAILED' ? '#ECFDF5' : b.paymentStatus === 'FAILED' ? '#FEF2F2' : '#FEF3C7',
+                                  color: (b.paymentStatus === 'PAID' || b.amount) && b.paymentStatus !== 'FAILED' ? '#059669' : b.paymentStatus === 'FAILED' ? '#DC2626' : '#D97706',
+                                }}
+                              >
+                                ⚡ ₹{b.amount || 999} {b.paymentStatus || 'PAID'}
+                              </span>
+                              {b.providerPaymentId && (
+                                <span style={{ fontSize: '0.72rem', color: '#64748B', fontFamily: 'monospace' }}>
+                                  {b.providerPaymentId.slice(0, 14)}...
+                                </span>
+                              )}
                             </div>
                           </td>
 
@@ -1546,6 +1572,11 @@ export const AdminDashboardPage: React.FC = () => {
                                 📞 {order.userPhone}
                               </div>
                             )}
+                            <div style={{ marginTop: '0.35rem' }}>
+                              <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.18rem 0.5rem', borderRadius: '6px', backgroundColor: order.orderType === 'STRATEGY_BOOKING' ? '#EDE9FE' : '#F1F5F9', color: order.orderType === 'STRATEGY_BOOKING' ? '#6D28D9' : '#475569', display: 'inline-block' }}>
+                                {order.orderType === 'STRATEGY_BOOKING' ? '🗓️ 1-on-1 Strategy Session' : (order.resourceId?.title || 'Digital Resource Purchase')}
+                              </span>
+                            </div>
                           </td>
 
                           <td style={{ padding: '1rem 1rem' }}>

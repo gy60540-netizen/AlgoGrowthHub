@@ -12,12 +12,12 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
 
   const footerData: FooterSettings = {
     description: "AlgoGrowthHub is the premier social media growth agency and creator ecosystem helping visionary brands and creators command algorithmic attention.",
-    instagramUrl: "https://www.instagram.com/algowinner01?igsi=c294MDhkcDM2bDg0",
-    twitterUrl: "https://x.com/algowinner01",
-    telegramUrl: "https://t.me/algowinner01",
     ...settings,
-    email: settings?.email || "algowinner01official@gmail.com",
-    mobile: settings?.mobile || "+91 9369348311",
+    instagramUrl: settings?.instagramUrl && settings.instagramUrl !== 'https://instagram.com/algogrowthhub' ? settings.instagramUrl : "https://www.instagram.com/algowinner01?igsi=c294MDhkcDM2bDg0",
+    twitterUrl: settings?.twitterUrl && settings.twitterUrl !== 'https://x.com/algogrowthhub' ? settings.twitterUrl : "https://x.com/algowinner01",
+    telegramUrl: settings?.telegramUrl && settings.telegramUrl !== 'https://t.me/algogrowthhub' ? settings.telegramUrl : "https://t.me/algowinner01",
+    email: settings?.email && settings.email !== 'hello@algogrowthhub.com' ? settings.email : "algowinner01official@gmail.com",
+    mobile: settings?.mobile && settings.mobile !== '+91 98765 43210' ? settings.mobile : "+91 9369348311",
   };
 
   return (

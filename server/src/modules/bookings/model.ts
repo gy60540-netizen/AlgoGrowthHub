@@ -12,6 +12,13 @@ export interface IBooking extends Document {
   timezone: string;
   message?: string;
   status: BookingStatus;
+  amount: number;
+  currency: string;
+  paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+  provider?: string;
+  providerOrderId?: string;
+  providerPaymentId?: string;
+  providerSignature?: string;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -33,6 +40,17 @@ const bookingSchema = new Schema<IBooking>(
       enum: Object.values(BOOKING_STATUS),
       default: BOOKING_STATUS.PENDING,
     },
+    amount: { type: Number, default: 999 },
+    currency: { type: String, default: 'INR' },
+    paymentStatus: {
+      type: String,
+      enum: ['PENDING', 'PAID', 'FAILED', 'REFUNDED'],
+      default: 'PENDING',
+    },
+    provider: { type: String, default: 'razorpay' },
+    providerOrderId: { type: String },
+    providerPaymentId: { type: String },
+    providerSignature: { type: String },
     notes: { type: String },
   },
   {

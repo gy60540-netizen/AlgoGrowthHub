@@ -192,6 +192,30 @@ export interface BookingPayload {
   preferredTime: string;
   timezone?: string;
   message?: string;
+  amount?: number;
+}
+
+export interface Booking {
+  _id: string;
+  id?: string;
+  name: string;
+  email: string;
+  phone: string;
+  company?: string;
+  service: string;
+  preferredDate: string;
+  preferredTime: string;
+  timezone?: string;
+  message?: string;
+  amount: number;
+  currency: string;
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
+  paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+  provider?: string;
+  providerOrderId?: string;
+  providerPaymentId?: string;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface CreatorApplicationPayload {

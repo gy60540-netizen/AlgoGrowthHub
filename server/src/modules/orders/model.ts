@@ -5,7 +5,9 @@ export interface IOrder extends Document {
   userEmail: string;
   userName?: string;
   userPhone?: string;
-  resourceId: mongoose.Types.ObjectId;
+  resourceId?: mongoose.Types.ObjectId;
+  bookingId?: mongoose.Types.ObjectId;
+  orderType?: 'RESOURCE_PURCHASE' | 'STRATEGY_BOOKING';
   amount: number;
   currency: string;
   provider: 'mock' | 'razorpay' | 'stripe';
@@ -25,7 +27,9 @@ const orderSchema = new Schema<IOrder>(
     userEmail: { type: String, required: true, lowercase: true, trim: true },
     userName: { type: String, trim: true },
     userPhone: { type: String, trim: true },
-    resourceId: { type: Schema.Types.ObjectId, ref: 'Resource', required: true },
+    resourceId: { type: Schema.Types.ObjectId, ref: 'Resource', required: false },
+    bookingId: { type: Schema.Types.ObjectId, ref: 'Booking', required: false },
+    orderType: { type: String, enum: ['RESOURCE_PURCHASE', 'STRATEGY_BOOKING'], default: 'RESOURCE_PURCHASE' },
     amount: { type: Number, required: true },
     currency: { type: String, default: 'INR' },
     provider: { type: String, enum: ['mock', 'razorpay', 'stripe'], default: 'mock' },

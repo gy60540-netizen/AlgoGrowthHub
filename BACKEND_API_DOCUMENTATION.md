@@ -696,7 +696,76 @@ Includes `agencyName`, `logo`, `theme` (preset, primaryColor, primaryHover, seco
 }
 ```
 
-#### 11.3 Refund Order
+#### 11.3 Booking Strategy Call Checkout (₹999)
+* **Method:** `POST`
+* **Route:** `/api/v1/payments/booking-checkout`
+* **Auth:** Public
+
+**Request Body:**
+```json
+{
+  "name": "Rohan Gupta",
+  "email": "rohan@example.com",
+  "phone": "+919876543210",
+  "company": "Agency XYZ",
+  "service": "Creator Monetization",
+  "preferredDate": "2026-09-15",
+  "preferredTime": "11:00 AM",
+  "timezone": "IST (UTC+5:30)",
+  "message": "1-on-1 strategy call booking",
+  "amount": 999
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": {
+    "bookingId": "68be9c2f...",
+    "orderId": "68be9c2f...",
+    "providerOrderId": "order_mock_123456",
+    "amount": 999,
+    "currency": "INR",
+    "provider": "razorpay",
+    "keyId": "rzp_test_..."
+  }
+}
+```
+
+#### 11.4 Verify Strategy Call Booking Payment
+* **Method:** `POST`
+* **Route:** `/api/v1/payments/booking-verify`
+* **Auth:** Public
+
+**Request Body:**
+```json
+{
+  "bookingId": "68be9c2f...",
+  "paymentId": "pay_mock_123456",
+  "signature": "mock_signature"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "success": true,
+  "data": {
+    "booking": {
+      "_id": "68be9c2f...",
+      "name": "Rohan Gupta",
+      "email": "rohan@example.com",
+      "amount": 999,
+      "currency": "INR",
+      "paymentStatus": "PAID",
+      "status": "CONFIRMED"
+    }
+  }
+}
+```
+
+#### 11.5 Refund Order
 * **Method:** `POST`
 * **Route:** `/api/v1/admin/orders/:id/refund`
 * **Auth:** Super Admin only

@@ -744,6 +744,50 @@ export async function verifyPayment(payload: VerifyPaymentPayload): Promise<{ su
   }
 }
 
+export interface InitiateBookingCheckoutResponse {
+  bookingId: string;
+  orderId: string;
+  providerOrderId: string;
+  amount: number;
+  currency: string;
+  provider: string;
+  keyId: string;
+}
+
+export interface VerifyBookingPaymentPayload {
+  bookingId: string;
+  paymentId: string;
+  signature: string;
+}
+
+export interface VerifyBookingPaymentResponse {
+  booking: any;
+}
+
+export async function initiateBookingCheckout(payload: BookingPayload): Promise<{ success: boolean; data?: InitiateBookingCheckoutResponse; message?: string }> {
+  try {
+    const res = await apiClient.post('/payments/booking-checkout', payload);
+    return { success: true, data: res.data?.data || res.data };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Booking checkout initiation failed'
+    };
+  }
+}
+
+export async function verifyBookingPayment(payload: VerifyBookingPaymentPayload): Promise<{ success: boolean; data?: VerifyBookingPaymentResponse; message?: string }> {
+  try {
+    const res = await apiClient.post('/payments/booking-verify', payload);
+    return { success: true, data: res.data?.data || res.data };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Booking payment verification failed'
+    };
+  }
+}
+
 export async function getAdminOrders(): Promise<{ success: boolean; data: any[]; message?: string }> {
   try {
     // Try primary admin route /admin/orders

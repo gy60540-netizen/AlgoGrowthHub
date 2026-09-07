@@ -243,11 +243,11 @@ const siteSettingsSchema = new Schema<ISiteSettings>(
         default:
           'AlgoGrowthHub is a premier digital growth agency specializing in high-performance social media architecture, creator community scaling, and revenue conversion.',
       },
-      email: { type: String, default: 'hello@algogrowthhub.com' },
-      mobile: { type: String, default: '+91 98765 43210' },
-      instagramUrl: { type: String, default: 'https://instagram.com/algogrowthhub' },
-      twitterUrl: { type: String, default: 'https://x.com/algogrowthhub' },
-      telegramUrl: { type: String, default: 'https://t.me/algogrowthhub' },
+      email: { type: String, default: 'algowinner01official@gmail.com' },
+      mobile: { type: String, default: '+91 9369348311' },
+      instagramUrl: { type: String, default: 'https://www.instagram.com/algowinner01?igsi=c294MDhkcDM2bDg0' },
+      twitterUrl: { type: String, default: 'https://x.com/algowinner01' },
+      telegramUrl: { type: String, default: 'https://t.me/algowinner01' },
       copyrightText: { type: String, default: '© 2026 AlgoGrowthHub. All rights reserved.' },
     },
     seoDefaults: {

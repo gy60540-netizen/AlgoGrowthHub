@@ -157,9 +157,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
             background-size: cover !important;
             background-position: center bottom !important;
             background-repeat: no-repeat !important;
-            min-height: 580px !important;
+            min-height: 100vh !important;
+            min-height: 100svh !important;
             height: auto !important;
-            max-height: 640px !important;
             padding-top: 0 !important;
             padding-bottom: 0 !important;
             display: flex !important;
@@ -169,11 +169,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
           }
 
           .hero-gradient-overlay {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.45) 30%, rgba(255, 255, 255, 0) 52%) !important;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.40) 28%, rgba(255, 255, 255, 0) 48%) !important;
           }
 
           .hero-content-container {
-            padding-top: 76px !important;
+            padding-top: 72px !important;
             max-width: 92% !important;
             margin: 0 auto !important;
             display: flex !important;
@@ -183,35 +183,36 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
           }
 
           .hero-main-heading {
-            font-size: clamp(1.38rem, 5.2vw, 1.7rem) !important;
-            margin-bottom: 0.4rem !important;
-            line-height: 1.18 !important;
+            font-size: clamp(1.28rem, 4.8vw, 1.62rem) !important;
+            margin-bottom: 0.35rem !important;
+            line-height: 1.16 !important;
             text-align: center !important;
           }
 
           .hero-subtext {
-            font-size: 0.82rem !important;
-            line-height: 1.38 !important;
-            margin-bottom: 0.75rem !important;
-            max-width: 310px !important;
+            font-size: 0.8rem !important;
+            line-height: 1.35 !important;
+            margin-bottom: 0.65rem !important;
+            max-width: 295px !important;
             text-align: center !important;
           }
 
           .hero-buttons-container {
-            flex-direction: column !important;
+            flex-direction: row !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 0.5rem !important;
-            width: 100% !important;
-            max-width: 230px !important;
+            gap: 0.55rem !important;
+            width: auto !important;
+            max-width: 100% !important;
             margin: 0 auto !important;
           }
 
           .hero-btn-primary, .hero-btn-secondary {
-            width: 100% !important;
-            padding: 0.58rem 1.15rem !important;
-            font-size: 0.84rem !important;
+            width: auto !important;
+            padding: 0.55rem 1.05rem !important;
+            font-size: 0.82rem !important;
             border-radius: 9999px !important;
+            white-space: nowrap !important;
           }
 
           .desktop-only-widget {

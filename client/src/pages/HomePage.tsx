@@ -61,23 +61,23 @@ export const HomePage: React.FC = () => {
       {/* Section 02: About (#F4F8FC) */}
       <AboutSection settings={siteSettings.about} />
 
-      {/* Section 03: Power Services (3x3 Grid) (#FFFFFF) */}
-      <ServicesGridSection services={services} />
+      {/* Section 03: Resources (Free/Premium Playbooks) (#F4F8FC) */}
+      <ResourcesSection resources={resources} />
 
-      {/* Section 04: Why Choose Us (4 Platform Cards) (#F4F8FC) */}
-      <WhyChooseUsSection settings={siteSettings.whyChooseUs} />
-
-      {/* Section 05: Meet Our Expert Team (Insta+LinkedIn) (#FFFFFF) */}
-      <ExpertTeamSection team={team} />
-
-      {/* Section 06: Creator Community (Instagram ONLY) (#F4F8FC) */}
-      <CreatorCommunitySection creators={creators} />
-
-      {/* Section 07: Client Results (Before/After Carousel) (#FFFFFF) */}
+      {/* Section 04: Client Results (Before/After Carousel) (#FFFFFF) */}
       <ClientResultsSection clientResults={clientResults} />
 
-      {/* Section 08: Resources (Free/Premium Playbooks) (#F4F8FC) */}
-      <ResourcesSection resources={resources} />
+      {/* Section 05: Creator Community (Instagram ONLY) (#F4F8FC) */}
+      <CreatorCommunitySection creators={creators} />
+
+      {/* Section 06: Power Services (3x3 Grid) (#FFFFFF) */}
+      <ServicesGridSection services={services} />
+
+      {/* Section 07: Why Choose Us (4 Platform Cards) (#F4F8FC) */}
+      <WhyChooseUsSection settings={siteSettings.whyChooseUs} />
+
+      {/* Section 08: Meet Our Expert Team (Insta+LinkedIn) (#FFFFFF) */}
+      <ExpertTeamSection team={team} />
 
       {/* Section 09: Book a Call Session (#FFFFFF) */}
       <BookCallSection settings={siteSettings.bookingSection} />

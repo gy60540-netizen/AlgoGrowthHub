@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, Send, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { Calendar, Clock, Send, CheckCircle2, AlertCircle, Sparkles, ShieldCheck, Lock, CreditCard } from 'lucide-react';
 import { BookingSectionSettings, BookingPayload } from '../../types';
-import { postBooking } from '../../services/api';
+import { initiateBookingCheckout, verifyBookingPayment } from '../../services/api';
 
 interface BookCallSectionProps {
   settings?: BookingSectionSettings;
@@ -18,7 +18,8 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
       "Vedio Editing",
       "Web Devolopment",
       "Ai Agent Building",
-      "Digital Assets"
+      "Digital Assets",
+      "Run Your PR"
     ]
   };
 
@@ -40,6 +41,44 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [confirmedBooking, setConfirmedBooking] = useState<any>(null);
+
+  const handleBookingVerification = async (bookingId: string, paymentId: string, signature: string) => {
+    try {
+      const verifyRes = await verifyBookingPayment({
+        bookingId,
+        paymentId,
+        signature,
+      });
+
+      if (!verifyRes.success || !verifyRes.data) {
+        setStatus('error');
+        setErrorMessage(verifyRes.message || 'Payment verification failed. Please contact support.');
+        setLoading(false);
+        return;
+      }
+
+      setConfirmedBooking(verifyRes.data.booking);
+      setStatus('success');
+      setSocialLink('');
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        service: data.availableServices?.[0] || 'Social Media Management',
+        preferredDate: '',
+        preferredTime: '11:00 AM - 11:30 AM',
+        timezone: 'IST (UTC+5:30)',
+        message: ''
+      });
+    } catch (err: any) {
+      setStatus('error');
+      setErrorMessage(err.message || 'Payment verification encountered an issue.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,31 +89,75 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
     try {
       const payload: BookingPayload = {
         ...formData,
+        amount: 999,
         message: [formData.message, socialLink ? `Social / Website: ${socialLink}` : ''].filter(Boolean).join('\n')
       };
-      const result = await postBooking(payload);
-      if (result.success) {
-        setStatus('success');
-        setSocialLink('');
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          company: '',
-          service: data.availableServices?.[0] || 'Social Media Management',
-          preferredDate: '',
-          preferredTime: '11:00 AM - 11:30 AM',
-          timezone: 'IST (UTC+5:30)',
-          message: ''
-        });
-      } else {
+
+      const checkoutRes = await initiateBookingCheckout(payload);
+      if (!checkoutRes.success || !checkoutRes.data) {
         setStatus('error');
-        setErrorMessage(result.message || 'Something went wrong. Please try again.');
+        setErrorMessage(checkoutRes.message || 'Failed to initiate booking checkout. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const checkoutData = checkoutRes.data;
+
+      // Check if Razorpay is loaded in window and has a valid key
+      if (
+        checkoutData.provider === 'razorpay' &&
+        (window as any).Razorpay &&
+        checkoutData.keyId &&
+        !checkoutData.keyId.includes('placeholder')
+      ) {
+        const options = {
+          key: checkoutData.keyId,
+          amount: (checkoutData.amount || 999) * 100,
+          currency: checkoutData.currency || 'INR',
+          name: 'AlgoGrowthHub',
+          description: `1-on-1 Growth Strategy Session (${formData.service})`,
+          image: '/logo.png',
+          order_id: checkoutData.providerOrderId,
+          handler: async (response: any) => {
+            await handleBookingVerification(
+              checkoutData.bookingId,
+              response.razorpay_payment_id,
+              response.razorpay_signature
+            );
+          },
+          prefill: {
+            name: formData.name,
+            email: formData.email,
+            contact: formData.phone,
+          },
+          theme: {
+            color: '#1F05E5',
+          },
+          modal: {
+            ondismiss: () => {
+              setLoading(false);
+            },
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', (response: any) => {
+          setLoading(false);
+          setStatus('error');
+          setErrorMessage(response.error?.description || 'Payment was declined or cancelled.');
+        });
+        rzp.open();
+      } else {
+        // Fallback / mock simulator mode (if running in test or placeholder keys)
+        await handleBookingVerification(
+          checkoutData.bookingId,
+          `pay_mock_${Date.now()}`,
+          `sig_mock_${Date.now()}`
+        );
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err.message || 'Submission failed');
-    } finally {
+      setErrorMessage(err.message || 'Booking submission failed');
       setLoading(false);
     }
   };
@@ -173,23 +256,37 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
               <div
                 style={{
                   backgroundColor: '#ECFDF5',
-                  border: '1px solid #A7F3D0',
-                  color: '#065F46',
-                  padding: '1.25rem',
-                  borderRadius: 'var(--radius-md)',
+                  border: '1.5px solid #10B981',
+                  borderRadius: '16px',
+                  padding: '1.5rem',
                   marginBottom: '2rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
+                  boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.15)',
                 }}
               >
-                <CheckCircle2 size={24} color="#10B981" />
-                <div>
-                  <strong>Session Booked Successfully!</strong>
-                  <div style={{ fontSize: '0.9rem' }}>
-                    Our strategists will contact you via email and WhatsApp with your meeting invitation.
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#D1FAE5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <CheckCircle2 size={24} color="#059669" />
+                  </div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#065F46' }}>
+                      1-on-1 Strategy Session Booked & Verified!
+                    </h4>
+                    <span style={{ display: 'inline-block', marginTop: '0.2rem', fontSize: '0.78rem', fontWeight: 800, color: '#059669', backgroundColor: '#D1FAE5', padding: '0.2rem 0.6rem', borderRadius: '9999px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      ⚡ ₹999 PAID • INSTANT CONFIRMATION
+                    </span>
                   </div>
                 </div>
+
+                <p style={{ fontSize: '0.92rem', color: '#047857', lineHeight: 1.6, margin: 0 }}>
+                  Thank you! Your booking and payment of <strong>₹999</strong> have been recorded successfully. Our senior growth strategist will review your profile and send your Google Meet invitation and agenda via email and WhatsApp.
+                </p>
+
+                {confirmedBooking?.providerPaymentId && (
+                  <div style={{ marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid #A7F3D0', fontSize: '0.8rem', color: '#065F46', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <span><strong>Transaction ID:</strong> <code>{confirmedBooking.providerPaymentId}</code></span>
+                    {confirmedBooking?._id && <span><strong>Booking Ref:</strong> <code>{confirmedBooking._id.slice(-8)}</code></span>}
+                  </div>
+                )}
               </div>
             )}
 
@@ -404,6 +501,46 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
                 />
               </div>
 
+              {/* Fee & Razorpay Trust Card */}
+              <div
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  border: '1.5px solid #E2E8F0',
+                  borderRadius: '12px',
+                  padding: '1rem 1.25rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0F172A' }}>
+                      Strategy Session Fee:
+                    </span>
+                    <span style={{ fontSize: '1.25rem', fontWeight: 900, color: '#1F05E5' }}>
+                      ₹999
+                    </span>
+                    <span style={{ fontSize: '0.85rem', textDecoration: 'line-through', color: '#94A3B8' }}>
+                      ₹1,999
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#16A34A', backgroundColor: '#DCFCE7', padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                      50% OFF
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.2rem' }}>
+                    Includes 30-Min 1-on-1 Call • Custom Audit • Action Plan
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: '#475569', fontWeight: 600 }}>
+                  <ShieldCheck size={16} color="#16A34A" />
+                  <span>Razorpay Verified</span>
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}
@@ -414,10 +551,14 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
                   fontSize: '1.02rem',
                   fontWeight: 800,
                   boxShadow: '0 8px 25px rgba(31, 5, 229, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.6rem',
                 }}
               >
-                <Send size={17} />
-                <span>{loading ? 'Submitting Strategy Request...' : 'Book Your Session Now'}</span>
+                <Lock size={17} />
+                <span>{loading ? 'Processing Payment...' : 'Pay ₹999 & Book Session Now'}</span>
               </button>
             </form>
           </div>

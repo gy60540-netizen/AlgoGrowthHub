@@ -1,9 +1,10 @@
 import crypto from 'crypto';
 import { Resource } from '../resources/model.js';
 import { Order, IOrder } from '../orders/model.js';
+import { Booking } from '../bookings/model.js';
 import { getPaymentProvider } from './provider.js';
 import { AppError } from '../../utils/AppError.js';
-import { ORDER_STATUS } from '../../config/constants.js';
+import { ORDER_STATUS, BOOKING_STATUS } from '../../config/constants.js';
 
 import { env } from '../../config/env.js';
 
@@ -126,5 +127,136 @@ export class PaymentService {
       downloadToken,
       downloadUrl: `/api/v1/resources/${order.resourceId}/download?token=${downloadToken}`,
     };
+  }
+
+  public static async initiateBookingCheckout(data: {
+    name: string;
+    email: string;
+    phone: string;
+    company?: string;
+    service: string;
+    preferredDate: string;
+    preferredTime: string;
+    timezone?: string;
+    message?: string;
+    amount?: number;
+  }): Promise<{
+    bookingId: string;
+    orderId: string;
+    providerOrderId: string;
+    amount: number;
+    currency: string;
+    provider: string;
+    keyId: string;
+  }> {
+    const bookingAmount = data.amount || 999;
+
+    // Create Booking record in PENDING payment status
+    const booking = await Booking.create({
+      name: data.name,
+      email: data.email.toLowerCase(),
+      phone: data.phone,
+      company: data.company,
+      service: data.service,
+      preferredDate: data.preferredDate,
+      preferredTime: data.preferredTime,
+      timezone: data.timezone || 'IST (UTC+5:30)',
+      message: data.message,
+      amount: bookingAmount,
+      currency: 'INR',
+      status: BOOKING_STATUS.PENDING,
+      paymentStatus: 'PENDING',
+    });
+
+    const provider = getPaymentProvider();
+    const providerResult = await provider.createOrder({
+      orderId: booking.id,
+      amount: bookingAmount,
+      currency: 'INR',
+      receipt: `rcpt_bk_${booking.id.slice(-8)}`,
+      customer: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+      },
+    });
+
+    booking.provider = providerResult.provider;
+    booking.providerOrderId = providerResult.providerOrderId;
+    await booking.save();
+
+    return {
+      bookingId: booking.id,
+      orderId: booking.id,
+      providerOrderId: providerResult.providerOrderId,
+      amount: booking.amount,
+      currency: booking.currency,
+      provider: booking.provider,
+      keyId: env.RAZORPAY_KEY_ID || '',
+    };
+  }
+
+  public static async verifyBookingPayment(data: {
+    bookingId: string;
+    paymentId: string;
+    signature: string;
+  }): Promise<{
+    booking: any;
+  }> {
+    const booking = await Booking.findById(data.bookingId);
+    if (!booking) {
+      throw new AppError('Booking not found', 404, 'NOT_FOUND');
+    }
+
+    if (booking.paymentStatus === 'PAID') {
+      return { booking };
+    }
+
+    const provider = getPaymentProvider();
+    const isValid = await provider.verifyPayment({
+      orderId: booking.providerOrderId || booking.id,
+      paymentId: data.paymentId,
+      signature: data.signature,
+    });
+
+    if (!isValid) {
+      booking.paymentStatus = 'FAILED';
+      await booking.save();
+      throw new AppError('Payment signature verification failed', 400, 'PAYMENT_VERIFICATION_FAILED');
+    }
+
+    booking.providerPaymentId = data.paymentId;
+    booking.providerSignature = data.signature;
+    booking.paymentStatus = 'PAID';
+    booking.status = BOOKING_STATUS.CONFIRMED;
+    await booking.save();
+
+    // Create Order record so the transaction reflects in Orders & Revenue Stream
+    try {
+      await Order.create({
+        userEmail: booking.email,
+        userName: booking.name,
+        userPhone: booking.phone,
+        bookingId: booking._id,
+        orderType: 'STRATEGY_BOOKING',
+        amount: booking.amount,
+        currency: booking.currency,
+        provider: booking.provider || 'razorpay',
+        providerOrderId: booking.providerOrderId,
+        providerPaymentId: data.paymentId,
+        providerSignature: data.signature,
+        status: ORDER_STATUS.PAID,
+        metadata: {
+          service: booking.service,
+          preferredDate: booking.preferredDate,
+          preferredTime: booking.preferredTime,
+          type: '1-on-1 Growth Consultation Session',
+        },
+      });
+    } catch (orderErr) {
+      console.warn('Warning creating order record for booking:', orderErr);
+    }
+
+    return { booking };
   }
 }
