@@ -81,8 +81,18 @@ if (env.NODE_ENV !== 'test') {
   app.use('/api', globalLimiter);
 }
 
-// Serve uploaded media statically
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+// Serve uploaded media statically with explicit permissive CORS
+app.use(
+  '/uploads',
+  cors({ origin: '*' }),
+  express.static(path.join(process.cwd(), 'uploads'), {
+    maxAge: '1d',
+    setHeaders: (res) => {
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    },
+  })
+);
 
 // Health Check API
 app.get('/api/health', (_req, res) => {

@@ -11,6 +11,56 @@ interface ImageUploadFieldProps {
   helperText?: string;
 }
 
+// Helper: client-side image compression to high-quality WebP Data URL
+const compressImageToDataUrl = (file: File, maxDimension = 1000, quality = 0.85): Promise<string> => {
+  return new Promise((resolve) => {
+    // If SVG, read as text data URL directly
+    if (file.type === 'image/svg+xml') {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        // Convert to lightweight WebP
+        const dataUrl = canvas.toDataURL('image/webp', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = () => resolve(event.target?.result as string);
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => resolve('');
+    reader.readAsDataURL(file);
+  });
+};
+
 export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
   label,
   value,
@@ -40,20 +90,28 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
     setErrorMessage('');
     setUploadSuccess(false);
 
-    const res = await uploadMedia(file);
-    setUploading(false);
+    try {
+      // 1. Generate immediate, persistent WebP Data URL
+      // This ensures the image NEVER disappears when Render container restarts or redeploys!
+      const persistentDataUrl = await compressImageToDataUrl(file, 1000, 0.85);
 
-    if (res.success && res.url) {
-      onChange(res.url);
-      setUploadSuccess(true);
-      setTimeout(() => setUploadSuccess(false), 3000);
-    } else {
-      setErrorMessage(res.message || 'Upload failed. Please try again.');
-    }
+      if (persistentDataUrl) {
+        onChange(persistentDataUrl);
+        setUploadSuccess(true);
+        setTimeout(() => setUploadSuccess(false), 3000);
+      }
 
-    // Reset file input so user can re-upload same file if needed
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      // 2. Also attempt server upload in background
+      uploadMedia(file).catch(() => {
+        // Silently keep persistentDataUrl if server storage is offline or ephemeral
+      });
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Image processing failed. Please paste a direct image URL.');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 

@@ -36,7 +36,8 @@ import {
   CheckCircle2,
   Shield,
   Eye,
-  TrendingUp
+  TrendingUp,
+  Edit3
 } from 'lucide-react';
 import { 
   getSiteSettings, 
@@ -56,10 +57,13 @@ import {
   createAdminResource,
   deleteAdminResource,
   createAdminCreator,
+  updateAdminCreator,
   deleteAdminCreator,
   createAdminTeamMember,
+  updateAdminTeamMember,
   deleteAdminTeamMember,
   createAdminClientResult,
+  updateAdminClientResult,
   deleteAdminClientResult,
   getAdminOrders,
   refundAdminOrder,
@@ -67,6 +71,7 @@ import {
   createAdminPartner,
   addPartnerResourceLink,
   togglePartnerStatus,
+  formatAssetUrl,
   defaultSiteSettings,
   defaultServices,
   defaultCreators,
@@ -208,6 +213,41 @@ export const AdminDashboardPage: React.FC = () => {
     rating: 5,
     isFeatured: true
   });
+
+  // Edit Modal States
+  const [isEditCreatorModalOpen, setIsEditCreatorModalOpen] = useState(false);
+  const [editingCreator, setEditingCreator] = useState<{
+    id: string;
+    name: string;
+    niche: string;
+    followerCount: string;
+    instagramUsername: string;
+    instagramUrl: string;
+    profileImage: string;
+    bio: string;
+    isFeatured: boolean;
+  } | null>(null);
+
+  const [isEditTeamModalOpen, setIsEditTeamModalOpen] = useState(false);
+  const [editingTeamMember, setEditingTeamMember] = useState<{
+    id: string;
+    name: string;
+    role: string;
+    image: string;
+    instagramUrl?: string;
+    linkedinUrl?: string;
+    isFeatured?: boolean;
+  } | null>(null);
+
+  const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
+  const [editingClientResult, setEditingClientResult] = useState<{
+    id: string;
+    clientName: string;
+    beforeImage: string;
+    afterImage: string;
+    rating: number;
+    isFeatured?: boolean;
+  } | null>(null);
 
   const fetchLiveBookings = async () => {
     setLoadingBookings(true);
@@ -504,6 +544,53 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
+  const handleOpenEditCreator = (c: Creator) => {
+    const cId = c._id || c.id || '';
+    setEditingCreator({
+      id: cId,
+      name: c.name || '',
+      niche: c.niche || '',
+      followerCount: c.followerCount || '',
+      instagramUsername: c.instagramUsername || '',
+      instagramUrl: c.instagramUrl || '',
+      profileImage: c.profileImage || '',
+      bio: c.bio || '',
+      isFeatured: c.isFeatured !== false,
+    });
+    setModalError('');
+    setIsEditCreatorModalOpen(true);
+  };
+
+  const handleUpdateCreatorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCreator || !editingCreator.id) return;
+    setModalLoading(true);
+    setModalError('');
+
+    const formattedUsername = editingCreator.instagramUsername.replace(/^@/, '').trim();
+    const formattedUrl = editingCreator.instagramUrl || `https://instagram.com/${formattedUsername}`;
+
+    const res = await updateAdminCreator(editingCreator.id, {
+      name: editingCreator.name,
+      niche: editingCreator.niche,
+      followerCount: editingCreator.followerCount,
+      instagramUsername: formattedUsername,
+      instagramUrl: formattedUrl,
+      profileImage: editingCreator.profileImage,
+      bio: editingCreator.bio,
+      isFeatured: editingCreator.isFeatured,
+    });
+
+    setModalLoading(false);
+    if (res.success) {
+      setIsEditCreatorModalOpen(false);
+      setEditingCreator(null);
+      fetchLiveCreators();
+    } else {
+      setModalError(res.message || 'Failed to update creator');
+    }
+  };
+
   // Team Member Actions
   const handleCreateTeamSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -546,6 +633,46 @@ export const AdminDashboardPage: React.FC = () => {
     }
   };
 
+  const handleOpenEditTeamMember = (m: ExpertTeamMember) => {
+    const mId = m._id || m.id || '';
+    setEditingTeamMember({
+      id: mId,
+      name: m.name || '',
+      role: m.role || '',
+      image: m.image || '',
+      instagramUrl: m.instagramUrl || '',
+      linkedinUrl: m.linkedinUrl || '',
+      isFeatured: m.isFeatured !== false,
+    });
+    setModalError('');
+    setIsEditTeamModalOpen(true);
+  };
+
+  const handleUpdateTeamSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTeamMember || !editingTeamMember.id) return;
+    setModalLoading(true);
+    setModalError('');
+
+    const res = await updateAdminTeamMember(editingTeamMember.id, {
+      name: editingTeamMember.name,
+      role: editingTeamMember.role,
+      image: editingTeamMember.image,
+      instagramUrl: editingTeamMember.instagramUrl || undefined,
+      linkedinUrl: editingTeamMember.linkedinUrl || undefined,
+      isFeatured: editingTeamMember.isFeatured,
+    });
+
+    setModalLoading(false);
+    if (res.success) {
+      setIsEditTeamModalOpen(false);
+      setEditingTeamMember(null);
+      fetchLiveTeam();
+    } else {
+      setModalError(res.message || 'Failed to update team member');
+    }
+  };
+
   // Client Results Actions
   const handleCreateClientResultSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -583,6 +710,44 @@ export const AdminDashboardPage: React.FC = () => {
     if (window.confirm('Delete this before/after client showcase?')) {
       await deleteAdminClientResult(id);
       setClientResults(prev => prev.filter(c => c._id !== id && c.id !== id));
+    }
+  };
+
+  const handleOpenEditClientResult = (item: ClientResult) => {
+    const clId = item._id || item.id || '';
+    setEditingClientResult({
+      id: clId,
+      clientName: item.clientName || '',
+      beforeImage: item.beforeImage || '',
+      afterImage: item.afterImage || '',
+      rating: item.rating || 5,
+      isFeatured: item.isFeatured !== false,
+    });
+    setModalError('');
+    setIsEditClientModalOpen(true);
+  };
+
+  const handleUpdateClientResultSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingClientResult || !editingClientResult.id) return;
+    setModalLoading(true);
+    setModalError('');
+
+    const res = await updateAdminClientResult(editingClientResult.id, {
+      clientName: editingClientResult.clientName,
+      beforeImage: editingClientResult.beforeImage,
+      afterImage: editingClientResult.afterImage,
+      rating: editingClientResult.rating,
+      isFeatured: editingClientResult.isFeatured,
+    });
+
+    setModalLoading(false);
+    if (res.success) {
+      setIsEditClientModalOpen(false);
+      setEditingClientResult(null);
+      fetchLiveClients();
+    } else {
+      setModalError(res.message || 'Failed to update client result');
     }
   };
 
@@ -1032,15 +1197,32 @@ export const AdminDashboardPage: React.FC = () => {
               return (
                 <div key={cId || i} className="hub-card" style={{ backgroundColor: 'var(--color-white)', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                    <img src={c.profileImage} alt={c.name} style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }} />
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCreator(cId)}
-                      title="Delete Creator"
-                      style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: '0.25rem' }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <img 
+                      src={formatAssetUrl(c.profileImage)} 
+                      alt={c.name} 
+                      onError={(e) => {
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=1F05E5&color=fff&bold=true`;
+                      }}
+                      style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }} 
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditCreator(c)}
+                        title="Edit Creator"
+                        style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: 'var(--color-primary)', borderRadius: '6px', cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Edit3 size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCreator(cId)}
+                        title="Delete Creator"
+                        style={{ background: '#FEE2E2', border: '1px solid #FECACA', color: '#EF4444', borderRadius: '6px', cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
 
                   <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '0.25rem' }}>
@@ -1074,15 +1256,32 @@ export const AdminDashboardPage: React.FC = () => {
               return (
                 <div key={mId || i} className="hub-card" style={{ backgroundColor: 'var(--color-white)', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                    <img src={m.image} alt={m.name} style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover' }} />
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteTeamMember(mId)}
-                      title="Delete Team Member"
-                      style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: '0.25rem' }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <img 
+                      src={formatAssetUrl(m.image)} 
+                      alt={m.name} 
+                      onError={(e) => {
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=1F05E5&color=fff&bold=true`;
+                      }}
+                      style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover' }} 
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditTeamMember(m)}
+                        title="Edit Team Member"
+                        style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: 'var(--color-primary)', borderRadius: '6px', cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Edit3 size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTeamMember(mId)}
+                        title="Delete Team Member"
+                        style={{ background: '#FEE2E2', border: '1px solid #FECACA', color: '#EF4444', borderRadius: '6px', cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
 
                   <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '0.25rem' }}>
@@ -1114,24 +1313,48 @@ export const AdminDashboardPage: React.FC = () => {
                     <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
                       {item.clientName}
                     </h3>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteClientResult(clId)}
-                      title="Delete Client Result"
-                      style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: '0.25rem' }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditClientResult(item)}
+                        title="Edit Client Case Study"
+                        style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: 'var(--color-primary)', borderRadius: '6px', cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Edit3 size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteClientResult(clId)}
+                        title="Delete Client Result"
+                        style={{ background: '#FEE2E2', border: '1px solid #FECACA', color: '#EF4444', borderRadius: '6px', cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
                     <div>
                       <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.2rem' }}>BEFORE</span>
-                      <img src={item.beforeImage} alt="Before" style={{ height: '85px', width: '100%', objectFit: 'cover', borderRadius: '4px' }} />
+                      <img 
+                        src={formatAssetUrl(item.beforeImage)} 
+                        alt="Before" 
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80';
+                        }}
+                        style={{ height: '85px', width: '100%', objectFit: 'cover', borderRadius: '4px' }} 
+                      />
                     </div>
                     <div>
                       <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#10B981', display: 'block', marginBottom: '0.2rem' }}>AFTER</span>
-                      <img src={item.afterImage} alt="After" style={{ height: '85px', width: '100%', objectFit: 'cover', borderRadius: '4px' }} />
+                      <img 
+                        src={formatAssetUrl(item.afterImage)} 
+                        alt="After" 
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80';
+                        }}
+                        style={{ height: '85px', width: '100%', objectFit: 'cover', borderRadius: '4px' }} 
+                      />
                     </div>
                   </div>
 
@@ -1196,8 +1419,11 @@ export const AdminDashboardPage: React.FC = () => {
                     }}
                   >
                     <img
-                      src={r.thumbnail || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"}
+                      src={formatAssetUrl(r.thumbnail) || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"}
                       alt={r.title}
+                      onError={(e) => {
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80";
+                      }}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   </div>
@@ -2617,6 +2843,169 @@ export const AdminDashboardPage: React.FC = () => {
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
                   <button type="button" onClick={() => { setIsAddLinkModalOpen(false); setSelectedPartnerForLink(null); }} className="btn btn-secondary btn-sm">Cancel</button>
                   <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Generating...' : 'Generate & Assign Link'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 6: Edit Creator Profile */}
+        {isEditCreatorModalOpen && editingCreator && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1.5rem' }}>
+            <div className="hub-card" style={{ width: '100%', maxWidth: '540px', backgroundColor: 'var(--color-white)', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Instagram size={22} color="#E1306C" />
+                  <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Edit Creator Profile</h2>
+                </div>
+                <button onClick={() => setIsEditCreatorModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              {modalError && <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', marginBottom: '1rem' }}>{modalError}</div>}
+
+              <form onSubmit={handleUpdateCreatorSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Creator Full Name *</label>
+                  <input type="text" required placeholder="e.g. Aarav Singhania" value={editingCreator.name} onChange={e => setEditingCreator({ ...editingCreator, name: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Content Niche *</label>
+                    <input type="text" required placeholder="e.g. Fintech & Investing" value={editingCreator.niche} onChange={e => setEditingCreator({ ...editingCreator, niche: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Follower Count *</label>
+                    <input type="text" required placeholder="e.g. 240K+" value={editingCreator.followerCount} onChange={e => setEditingCreator({ ...editingCreator, followerCount: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Instagram Handle (Without @) *</label>
+                  <input type="text" required placeholder="e.g. aarav.invests" value={editingCreator.instagramUsername} onChange={e => setEditingCreator({ ...editingCreator, instagramUsername: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <ImageUploadField
+                  label="Profile Image (1:1 Ratio) *"
+                  value={editingCreator.profileImage}
+                  onChange={(url) => setEditingCreator({ ...editingCreator, profileImage: url })}
+                  aspectRatio="1/1"
+                  helperText="Recommended: Square headshot photo (auto-compressed to WebP)"
+                />
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Short Bio / Niche Statement *</label>
+                  <textarea rows={2} required placeholder="Explosive financial literacy reels reaching 5M+ monthly viewers." value={editingCreator.bio} onChange={e => setEditingCreator({ ...editingCreator, bio: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button type="button" onClick={() => setIsEditCreatorModalOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
+                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Saving...' : 'Update Creator'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 7: Edit Team Member */}
+        {isEditTeamModalOpen && editingTeamMember && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1.5rem' }}>
+            <div className="hub-card" style={{ width: '100%', maxWidth: '540px', backgroundColor: 'var(--color-white)', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Edit Team Member</h2>
+                <button onClick={() => setIsEditTeamModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              {modalError && <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', marginBottom: '1rem' }}>{modalError}</div>}
+
+              <form onSubmit={handleUpdateTeamSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Member Name *</label>
+                  <input type="text" required placeholder="e.g. Vikramaditya Rathore" value={editingTeamMember.name} onChange={e => setEditingTeamMember({ ...editingTeamMember, name: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Designation / Role *</label>
+                  <input type="text" required placeholder="e.g. Head of Paid Performance & Viral Growth" value={editingTeamMember.role} onChange={e => setEditingTeamMember({ ...editingTeamMember, role: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <ImageUploadField
+                  label="Photo Image (4:5 Aspect Ratio) *"
+                  value={editingTeamMember.image}
+                  onChange={(url) => setEditingTeamMember({ ...editingTeamMember, image: url })}
+                  aspectRatio="4/5"
+                  helperText="Recommended: 4:5 portrait headshot (auto-compressed to WebP)"
+                />
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Instagram Profile URL</label>
+                    <input type="url" placeholder="https://instagram.com/user" value={editingTeamMember.instagramUrl || ''} onChange={e => setEditingTeamMember({ ...editingTeamMember, instagramUrl: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>LinkedIn Profile URL</label>
+                    <input type="url" placeholder="https://linkedin.com/in/user" value={editingTeamMember.linkedinUrl || ''} onChange={e => setEditingTeamMember({ ...editingTeamMember, linkedinUrl: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button type="button" onClick={() => setIsEditTeamModalOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
+                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Saving...' : 'Update Team Member'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 8: Edit Client Case Study */}
+        {isEditClientModalOpen && editingClientResult && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1.5rem' }}>
+            <div className="hub-card" style={{ width: '100%', maxWidth: '540px', backgroundColor: 'var(--color-white)', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Edit Client Case Study</h2>
+                <button onClick={() => setIsEditClientModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              {modalError && <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', marginBottom: '1rem' }}>{modalError}</div>}
+
+              <form onSubmit={handleUpdateClientResultSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Client / Brand Name *</label>
+                  <input type="text" required placeholder="e.g. GrowthX E-Commerce" value={editingClientResult.clientName} onChange={e => setEditingClientResult({ ...editingClientResult, clientName: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <ImageUploadField
+                  label="Before Screenshot *"
+                  value={editingClientResult.beforeImage}
+                  onChange={(url) => setEditingClientResult({ ...editingClientResult, beforeImage: url })}
+                  aspectRatio="16/9"
+                />
+
+                <ImageUploadField
+                  label="After Screenshot *"
+                  value={editingClientResult.afterImage}
+                  onChange={(url) => setEditingClientResult({ ...editingClientResult, afterImage: url })}
+                  aspectRatio="16/9"
+                />
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Client Rating (1 to 5 Stars)</label>
+                  <select value={editingClientResult.rating} onChange={e => setEditingClientResult({ ...editingClientResult, rating: Number(e.target.value) })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none', backgroundColor: 'var(--color-white)' }}>
+                    <option value={5}>⭐⭐⭐⭐⭐ (5.0 Stars)</option>
+                    <option value={4}>⭐⭐⭐⭐ (4.0 Stars)</option>
+                    <option value={3}>⭐⭐⭐ (3.0 Stars)</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button type="button" onClick={() => setIsEditClientModalOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
+                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Saving...' : 'Update Case Study'}</button>
                 </div>
               </form>
             </div>

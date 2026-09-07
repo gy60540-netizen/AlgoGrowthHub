@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Instagram, ArrowRight, Sparkles } from 'lucide-react';
-import { getCreators, defaultCreators } from '../services/api';
+import { getCreators, defaultCreators, formatAssetUrl } from '../services/api';
 import { Creator } from '../types';
 
 export const CreatorsPage: React.FC = () => {
@@ -56,8 +56,11 @@ export const CreatorsPage: React.FC = () => {
                   }}
                 >
                   <img
-                    src={creator.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"}
+                    src={formatAssetUrl(creator.profileImage) || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=1F05E5&color=fff&size=400&bold=true`}
                     alt={creator.name}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=1F05E5&color=fff&size=400&bold=true`;
+                    }}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { HeroSettings } from '../../types';
+import { formatAssetUrl } from '../../services/api';
 
 interface HeroSectionProps {
   settings?: HeroSettings;
@@ -13,11 +14,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
   const primaryCtaUrl = settings?.ctaLink1 || "/book-session";
   const secondaryCta = settings?.ctaText2 || "Explore Services";
   const secondaryCtaUrl = settings?.ctaLink2 || "/services";
+  const heroBg = formatAssetUrl(settings?.heroImage || '/hero-bg.jpg');
 
   return (
     <section
       id="hero"
       className="hero-section"
+      style={{ backgroundImage: `url('${heroBg}')` }}
     >
       {/* Soft Top Sky Gradient to guarantee high text contrast */}
       <div className="hero-gradient-overlay" />
@@ -70,7 +73,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ settings }) => {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          background-image: url('/hero-bg.jpg');
           background-size: 100% auto;
           background-position: center bottom;
           background-repeat: no-repeat;

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Linkedin, Users, ArrowRight } from 'lucide-react';
 import { ExpertTeamMember } from '../../types';
+import { formatAssetUrl } from '../../services/api';
 
 interface ExpertTeamSectionProps {
   team: ExpertTeamMember[];
@@ -62,8 +63,11 @@ export const ExpertTeamSection: React.FC<ExpertTeamSectionProps> = ({ team }) =>
                 }}
               >
                 <img
-                  src={member.image || "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80"}
+                  src={formatAssetUrl(member.image) || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1F05E5&color=fff&size=400&bold=true`}
                   alt={member.name}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1F05E5&color=fff&size=400&bold=true`;
+                  }}
                   style={{
                     width: '100%',
                     height: '100%',

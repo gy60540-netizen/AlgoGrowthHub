@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Creator } from '../../types';
+import { formatAssetUrl } from '../../services/api';
 
 interface CreatorCommunitySectionProps {
   creators: Creator[];
@@ -80,8 +81,11 @@ export const CreatorCommunitySection: React.FC<CreatorCommunitySectionProps> = (
                 }}
               >
                 <img
-                  src={creator.profileImage || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}
+                  src={formatAssetUrl(creator.profileImage) || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=1F05E5&color=fff&size=200&bold=true`}
                   alt={creator.name}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=1F05E5&color=fff&size=200&bold=true`;
+                  }}
                   style={{
                     width: '100%',
                     height: '100%',

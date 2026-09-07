@@ -556,6 +556,18 @@ export async function createAdminCreator(payload: any): Promise<{ success: boole
   }
 }
 
+export async function updateAdminCreator(id: string, payload: any): Promise<{ success: boolean; data?: Creator; message?: string }> {
+  try {
+    const res = await apiClient.patch(`/admin/creators/${id}`, payload);
+    return { success: true, data: res.data?.data || res.data };
+  } catch (err: any) {
+    return { 
+      success: false, 
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to update creator' 
+    };
+  }
+}
+
 export async function deleteAdminCreator(id: string): Promise<boolean> {
   try {
     await apiClient.delete(`/admin/creators/${id}`);
@@ -577,6 +589,18 @@ export async function createAdminTeamMember(payload: any): Promise<{ success: bo
   }
 }
 
+export async function updateAdminTeamMember(id: string, payload: any): Promise<{ success: boolean; data?: ExpertTeamMember; message?: string }> {
+  try {
+    const res = await apiClient.patch(`/admin/expert-team/${id}`, payload);
+    return { success: true, data: res.data?.data || res.data };
+  } catch (err: any) {
+    return { 
+      success: false, 
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to update team member' 
+    };
+  }
+}
+
 export async function deleteAdminTeamMember(id: string): Promise<boolean> {
   try {
     await apiClient.delete(`/admin/expert-team/${id}`);
@@ -594,6 +618,18 @@ export async function createAdminClientResult(payload: any): Promise<{ success: 
     return { 
       success: false, 
       message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to create client result' 
+    };
+  }
+}
+
+export async function updateAdminClientResult(id: string, payload: any): Promise<{ success: boolean; data?: ClientResult; message?: string }> {
+  try {
+    const res = await apiClient.patch(`/admin/client-results/${id}`, payload);
+    return { success: true, data: res.data?.data || res.data };
+  } catch (err: any) {
+    return { 
+      success: false, 
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to update client result' 
     };
   }
 }
@@ -621,11 +657,12 @@ export function formatAssetUrl(url?: string): string {
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
     return url;
   }
-  if (url.startsWith('/uploads/')) {
+  if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
     const serverBase = import.meta.env.VITE_API_BASE_URL
       ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, '')
-      : (import.meta.env.PROD ? 'https://algogrowthhub.onrender.com' : '');
-    return `${serverBase}${url}`;
+      : (import.meta.env.PROD ? 'https://algogrowthhub.onrender.com' : 'http://localhost:5000');
+    return `${serverBase}${cleanUrl}`;
   }
   return url;
 }

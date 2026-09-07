@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Service } from '../../types';
+import { formatAssetUrl } from '../../services/api';
 
 interface ServicesGridSectionProps {
   services: Service[];
@@ -69,8 +70,11 @@ export const ServicesGridSection: React.FC<ServicesGridSectionProps> = ({ servic
                   }}
                 >
                   <img
-                    src={service.image || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80"}
+                    src={formatAssetUrl(service.image) || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80"}
                     alt={service.title}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80";
+                    }}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
                   />
                   <div
