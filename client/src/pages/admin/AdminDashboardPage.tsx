@@ -36,6 +36,7 @@ import {
   CheckCircle2,
   Shield,
   Eye,
+  EyeOff,
   TrendingUp,
   Edit3
 } from 'lucide-react';
@@ -135,6 +136,7 @@ export const AdminDashboardPage: React.FC = () => {
     initialResourceId: '',
     referralCode: ''
   });
+  const [showPartnerPassword, setShowPartnerPassword] = useState(false);
 
   const [newLinkForm, setNewLinkForm] = useState({
     resourceId: '',
@@ -831,7 +833,7 @@ export const AdminDashboardPage: React.FC = () => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '2.5rem' }}>
-          <img src="/logo.png" alt="Logo" style={{ height: '36px', width: 'auto', filter: 'brightness(1.3)' }} />
+          <img src="/logo.png?v=2" alt="Logo" style={{ height: '36px', width: 'auto', filter: 'brightness(1.3)' }} />
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
@@ -2738,15 +2740,25 @@ export const AdminDashboardPage: React.FC = () => {
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Partner Initial Password *</label>
-                  <input
-                    type="text"
-                    required
-                    minLength={6}
-                    placeholder="e.g. Aman@12345"
-                    value={newPartnerForm.password}
-                    onChange={e => setNewPartnerForm({ ...newPartnerForm, password: e.target.value })}
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showPartnerPassword ? "text" : "password"}
+                      required
+                      minLength={6}
+                      placeholder="e.g. Aman@12345"
+                      value={newPartnerForm.password}
+                      onChange={e => setNewPartnerForm({ ...newPartnerForm, password: e.target.value })}
+                      style={{ width: '100%', padding: '0.75rem 2.75rem 0.75rem 0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPartnerPassword(!showPartnerPassword)}
+                      title={showPartnerPassword ? "Hide password" : "Show password"}
+                      style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', padding: '4px' }}
+                    >
+                      {showPartnerPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                   <span style={{ fontSize: '0.75rem', color: '#64748B', display: 'block', marginTop: '0.25rem' }}>
                     Password is securely hashed via bcrypt. Share this with the partner for portal login.
                   </span>

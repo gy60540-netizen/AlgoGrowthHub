@@ -45,7 +45,7 @@ export const Navbar: React.FC = () => {
         {/* Brand Logo - Bigger & Prominent */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           <img
-            src="/logo.png"
+            src="/logo.png?v=2"
             alt="AlgoGrowthHub"
             style={{ height: '44px', width: 'auto', objectFit: 'contain' }}
           />

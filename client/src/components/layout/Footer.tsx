@@ -43,7 +43,7 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
           <div style={{ maxWidth: '340px' }}>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', marginBottom: '1.25rem' }}>
               <img
-                src="/logo.png"
+                src="/logo.png?v=2"
                 alt="AlgoGrowthHub"
                 style={{ height: '46px', width: 'auto', filter: 'brightness(1.35)' }}
               />

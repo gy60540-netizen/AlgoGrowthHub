@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, Send, CheckCircle2, AlertCircle, Sparkles, ShieldCheck, Lock, CreditCard } from 'lucide-react';
 import { BookingSectionSettings, BookingPayload } from '../../types';
-import { initiateBookingCheckout, verifyBookingPayment } from '../../services/api';
+import { initiateBookingCheckout, verifyBookingPayment, formatAssetUrl } from '../../services/api';
 import { getActiveReferralCode } from '../../hooks/useReferralAttribution';
 
 interface BookCallSectionProps {
@@ -24,7 +24,9 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
     ]
   };
 
-  const imageSrc = (data.image && !data.image.includes('unsplash')) ? data.image : '/booking-call.png';
+  const imageSrc = (data.image && !data.image.includes('unsplash') && data.image !== '/booking-call.png') 
+    ? formatAssetUrl(data.image) 
+    : '/booking-call.png?v=2';
 
   const [formData, setFormData] = useState<BookingPayload>({
     name: '',
@@ -582,7 +584,7 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
                 src={imageSrc}
                 alt="Book Strategy Call Creator Studio"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/booking-call.png';
+                  (e.target as HTMLImageElement).src = '/booking-call.png?v=2';
                 }}
                 style={{
                   width: '100%',

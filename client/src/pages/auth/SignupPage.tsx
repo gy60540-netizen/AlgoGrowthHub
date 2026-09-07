@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User as UserIcon, Mail, Lock, ArrowRight, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { User as UserIcon, Mail, Lock, ArrowRight, Sparkles, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const SignupPage: React.FC = () => {
@@ -8,6 +8,8 @@ export const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { register } = useAuth();
@@ -157,20 +159,39 @@ export const SignupPage: React.FC = () => {
             </label>
             <div style={{ position: 'relative' }}>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.8rem 1rem 0.8rem 2.5rem',
+                  padding: '0.8rem 2.75rem 0.8rem 2.5rem',
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--color-border)',
                   outline: 'none',
                 }}
               />
               <Lock size={16} color="#64748B" style={{ position: 'absolute', left: '12px', top: '15px' }} />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                title={showPassword ? "Hide password" : "Show password"}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '12px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#64748B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px',
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
@@ -180,20 +201,39 @@ export const SignupPage: React.FC = () => {
             </label>
             <div style={{ position: 'relative' }}>
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 required
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.8rem 1rem 0.8rem 2.5rem',
+                  padding: '0.8rem 2.75rem 0.8rem 2.5rem',
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--color-border)',
                   outline: 'none',
                 }}
               />
               <Lock size={16} color="#64748B" style={{ position: 'absolute', left: '12px', top: '15px' }} />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                title={showConfirmPassword ? "Hide password" : "Show password"}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '12px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#64748B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px',
+                }}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
