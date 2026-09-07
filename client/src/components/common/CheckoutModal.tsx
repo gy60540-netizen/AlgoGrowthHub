@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ShieldCheck, Lock, CheckCircle2, AlertCircle, ArrowRight, Download, CreditCard, Smartphone, Building } from 'lucide-react';
 import { Resource } from '../../types';
 import { initiateCheckout, verifyPayment } from '../../services/api';
+import { getActiveReferralCode } from '../../hooks/useReferralAttribution';
 
 interface CheckoutModalProps {
   resource: Resource;
@@ -34,11 +35,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setErrorMessage('');
 
     try {
+      const activeRef = getActiveReferralCode();
       const res = await initiateCheckout({
         resourceId: resource._id || (resource as any).id || '',
         userEmail: customerEmail,
         userName: customerName,
         userPhone: customerPhone,
+        referralCode: activeRef || undefined,
       });
 
       if (!res.success || !res.data) {

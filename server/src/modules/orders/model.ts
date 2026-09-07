@@ -7,6 +7,8 @@ export interface IOrder extends Document {
   userPhone?: string;
   resourceId?: mongoose.Types.ObjectId;
   bookingId?: mongoose.Types.ObjectId;
+  partnerId?: mongoose.Types.ObjectId;
+  referralCode?: string;
   orderType?: 'RESOURCE_PURCHASE' | 'STRATEGY_BOOKING';
   amount: number;
   currency: string;
@@ -29,6 +31,8 @@ const orderSchema = new Schema<IOrder>(
     userPhone: { type: String, trim: true },
     resourceId: { type: Schema.Types.ObjectId, ref: 'Resource', required: false },
     bookingId: { type: Schema.Types.ObjectId, ref: 'Booking', required: false },
+    partnerId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
+    referralCode: { type: String, uppercase: true, trim: true, required: false },
     orderType: { type: String, enum: ['RESOURCE_PURCHASE', 'STRATEGY_BOOKING'], default: 'RESOURCE_PURCHASE' },
     amount: { type: Number, required: true },
     currency: { type: String, default: 'INR' },
@@ -53,5 +57,7 @@ const orderSchema = new Schema<IOrder>(
 orderSchema.index({ userEmail: 1, resourceId: 1 });
 orderSchema.index({ providerOrderId: 1 });
 orderSchema.index({ downloadToken: 1 });
+orderSchema.index({ partnerId: 1 });
+orderSchema.index({ referralCode: 1 });
 
 export const Order = mongoose.model<IOrder>('Order', orderSchema);

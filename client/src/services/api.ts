@@ -8,7 +8,11 @@ import {
   Resource,
   BookingPayload,
   CreatorApplicationPayload,
-  Lead
+  Lead,
+  Partner,
+  PartnerDashboardData,
+  PartnerLead,
+  CreatePartnerPayload
 } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://algogrowthhub.onrender.com/api/v1' : '/api/v1');
@@ -696,6 +700,7 @@ export interface InitiateCheckoutPayload {
   userEmail: string;
   userName?: string;
   userPhone?: string;
+  referralCode?: string;
 }
 
 export interface InitiateCheckoutResponse {
@@ -830,6 +835,126 @@ export async function refundAdminOrder(orderId: string, reason?: string): Promis
       success: false,
       message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Refund processing failed'
     };
+  }
+}
+
+// -------------------------------------------------------------
+// PARTNER & REFERRAL APIS
+// -------------------------------------------------------------
+
+export async function getAdminPartners(): Promise<{
+  success: boolean;
+  data: {
+    partners: Partner[];
+    summary: {
+      totalPartners: number;
+      activePartners: number;
+      totalLinks: number;
+      totalClicks: number;
+      totalSales: number;
+      totalRevenue: number;
+    };
+  };
+  message?: string;
+}> {
+  try {
+    const res = await apiClient.get('/admin/partners');
+    return { success: true, data: res.data?.data || { partners: [], summary: { totalPartners: 0, activePartners: 0, totalLinks: 0, totalClicks: 0, totalSales: 0, totalRevenue: 0 } } };
+  } catch (err: any) {
+    return {
+      success: false,
+      data: { partners: [], summary: { totalPartners: 0, activePartners: 0, totalLinks: 0, totalClicks: 0, totalSales: 0, totalRevenue: 0 } },
+      message: err.response?.data?.message || err.message || 'Failed to fetch partners'
+    };
+  }
+}
+
+export async function createAdminPartner(payload: CreatePartnerPayload): Promise<{ success: boolean; data?: Partner; message?: string }> {
+  try {
+    const res = await apiClient.post('/admin/partners', payload);
+    return { success: true, data: res.data?.data };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to create partner'
+    };
+  }
+}
+
+export async function addPartnerResourceLink(
+  partnerId: string,
+  resourceIdOrPayload?: string | { code?: string; resourceId?: string },
+  code?: string
+): Promise<{ success: boolean; data?: Partner; message?: string }> {
+  try {
+    let payloadBody: { code?: string; resourceId?: string } = {};
+    if (typeof resourceIdOrPayload === 'object' && resourceIdOrPayload !== null) {
+      payloadBody = resourceIdOrPayload;
+    } else {
+      payloadBody = { resourceId: resourceIdOrPayload || undefined, code: code || undefined };
+    }
+    const res = await apiClient.post(`/admin/partners/${partnerId}/links`, payloadBody);
+    return { success: true, data: res.data?.data };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to add referral link'
+    };
+  }
+}
+
+export async function togglePartnerStatus(
+  partnerId: string,
+  status: 'ACTIVE' | 'DISABLED'
+): Promise<{ success: boolean; data?: Partner; message?: string }> {
+  try {
+    const res = await apiClient.patch(`/admin/partners/${partnerId}/status`, { status });
+    return { success: true, data: res.data?.data };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to update partner status'
+    };
+  }
+}
+
+export async function getPartnerDashboard(): Promise<{ success: boolean; data?: PartnerDashboardData; message?: string }> {
+  try {
+    const res = await apiClient.get('/partner/dashboard');
+    return { success: true, data: res.data?.data };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to load partner dashboard'
+    };
+  }
+}
+
+export async function getPartnerLeads(): Promise<{ success: boolean; data: PartnerLead[]; message?: string }> {
+  try {
+    const res = await apiClient.get('/partner/leads');
+    return { success: true, data: res.data?.data || [] };
+  } catch (err: any) {
+    return {
+      success: false,
+      data: [],
+      message: err.response?.data?.message || err.response?.data?.error?.message || err.message || 'Failed to load partner leads'
+    };
+  }
+}
+
+export async function trackReferralClick(payload: {
+  code: string;
+  landingPath?: string;
+  resourceId?: string;
+  visitorId?: string;
+  referrer?: string;
+}): Promise<{ success: boolean; data?: any }> {
+  try {
+    const res = await apiClient.post('/referrals/track', payload);
+    return { success: true, data: res.data?.data };
+  } catch (_err) {
+    return { success: false };
   }
 }
 

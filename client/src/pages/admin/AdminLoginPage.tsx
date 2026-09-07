@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const AdminLoginPage: React.FC = () => {
+  const [loginRole, setLoginRole] = useState<'admin' | 'partner'>('admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,9 +20,19 @@ export const AdminLoginPage: React.FC = () => {
     try {
       const res = await login(email.trim(), password);
       if (res.success) {
-        navigate('/admin');
+        const role = (res.user?.role || '').toUpperCase();
+        if (role === 'PARTNER') {
+          navigate('/partner/dashboard');
+        } else {
+          if (loginRole === 'partner') {
+            // Admin accidentally logged in on partner tab
+            navigate('/admin');
+          } else {
+            navigate('/admin');
+          }
+        }
       } else {
-        setError(res.message || 'Invalid administrator credentials.');
+        setError(res.message || 'Invalid credentials. Please verify your email and password.');
       }
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
@@ -29,6 +40,8 @@ export const AdminLoginPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const isPartner = loginRole === 'partner';
 
   return (
     <div
@@ -45,34 +58,104 @@ export const AdminLoginPage: React.FC = () => {
         className="hub-card"
         style={{
           width: '100%',
-          maxWidth: '450px',
+          maxWidth: '460px',
           backgroundColor: 'var(--color-white)',
-          padding: '2.75rem',
+          padding: '2.5rem',
           boxShadow: 'var(--shadow-xl)',
           borderRadius: 'var(--radius-xl)',
         }}
       >
+        {/* Role Selector Segmented Control */}
+        <div
+          style={{
+            display: 'flex',
+            backgroundColor: '#F1F5F9',
+            padding: '0.35rem',
+            borderRadius: '12px',
+            marginBottom: '2rem',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setLoginRole('admin');
+              setError('');
+            }}
+            style={{
+              flex: 1,
+              padding: '0.6rem 0.75rem',
+              borderRadius: '9px',
+              border: 'none',
+              backgroundColor: !isPartner ? '#FFFFFF' : 'transparent',
+              color: !isPartner ? '#0F172A' : '#64748B',
+              fontWeight: !isPartner ? 800 : 600,
+              fontSize: '0.86rem',
+              cursor: 'pointer',
+              boxShadow: !isPartner ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <ShieldCheck size={16} color={!isPartner ? 'var(--color-primary)' : '#64748B'} />
+            <span>Login as Admin</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setLoginRole('partner');
+              setError('');
+            }}
+            style={{
+              flex: 1,
+              padding: '0.6rem 0.75rem',
+              borderRadius: '9px',
+              border: 'none',
+              backgroundColor: isPartner ? '#FFFFFF' : 'transparent',
+              color: isPartner ? '#1F05E5' : '#64748B',
+              fontWeight: isPartner ? 800 : 600,
+              fontSize: '0.86rem',
+              cursor: 'pointer',
+              boxShadow: isPartner ? '0 2px 8px rgba(31, 5, 229, 0.12)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Users size={16} color={isPartner ? '#1F05E5' : '#64748B'} />
+            <span>Login as Partner</span>
+          </button>
+        </div>
+
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div
             style={{
               width: '56px',
               height: '56px',
               borderRadius: '50%',
-              backgroundColor: 'var(--color-primary-light)',
-              color: 'var(--color-primary)',
+              backgroundColor: isPartner ? '#EDE9FE' : 'var(--color-primary-light)',
+              color: isPartner ? '#6D28D9' : 'var(--color-primary)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '1rem',
             }}
           >
-            <ShieldCheck size={28} />
+            {isPartner ? <Users size={28} /> : <ShieldCheck size={28} />}
           </div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-text-primary)' }}>
-            CMS Administrator
+            {isPartner ? 'Partner Referral Portal' : 'CMS Administrator'}
           </h1>
-          <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
-            AlgoGrowthHub Content & Operations Control
+          <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
+            {isPartner
+              ? 'Access your referral links, visitor traffic & live verified leads'
+              : 'AlgoGrowthHub Content & Operations Control'}
           </p>
         </div>
 
@@ -99,13 +182,13 @@ export const AdminLoginPage: React.FC = () => {
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '0.4rem' }}>
-              Admin Email
+              {isPartner ? 'Partner Email Address' : 'Admin Email'}
             </label>
             <div style={{ position: 'relative' }}>
               <input
                 type="email"
                 required
-                placeholder="admin@example.com"
+                placeholder={isPartner ? 'aman@example.com' : 'admin@example.com'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
@@ -147,9 +230,14 @@ export const AdminLoginPage: React.FC = () => {
             type="submit"
             disabled={loading}
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.95rem', marginTop: '0.5rem' }}
+            style={{
+              width: '100%',
+              padding: '0.95rem',
+              marginTop: '0.5rem',
+              backgroundColor: isPartner ? '#1F05E5' : undefined,
+            }}
           >
-            <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
+            <span>{loading ? 'Authenticating...' : isPartner ? 'Sign In to Partner Portal' : 'Sign In to Dashboard'}</span>
             <ArrowRight size={16} />
           </button>
         </form>

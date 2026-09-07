@@ -40,6 +40,7 @@ import { paymentRoutes } from './modules/payments/routes.js';
 import { orderRoutes } from './modules/orders/routes.js';
 import { mediaRoutes } from './modules/media/routes.js';
 import { auditLogRoutes } from './modules/auditLogs/routes.js';
+import { adminPartnerRoutes, partnerSelfRoutes, publicReferralRoutes } from './modules/referrals/routes.js';
 import { AdminDashboardController } from './modules/admin/dashboardController.js';
 
 export const app = express();
@@ -108,6 +109,10 @@ app.use('/api/v1/resources', publicResourceRoutes);
 app.use('/api/v1/bookings', publicBookingRoutes);
 app.use('/api/v1/leads', publicLeadRoutes);
 app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/referrals', publicReferralRoutes);
+
+// Partner Self Portal Endpoints
+app.use('/api/v1/partner', partnerSelfRoutes);
 
 // Admin CMS Endpoints
 app.use('/api/v1/admin/users', userRoutes);
@@ -122,6 +127,7 @@ app.use('/api/v1/admin/bookings', adminBookingRoutes);
 app.use('/api/v1/admin/leads', adminLeadRoutes);
 app.use('/api/v1/admin/orders', orderRoutes);
 app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/admin/partners', adminPartnerRoutes);
 app.use('/api/v1/admin/media', mediaRoutes);
 app.use('/api/v1/media', mediaRoutes);
 app.use('/api/v1/admin/audit-logs', auditLogRoutes);

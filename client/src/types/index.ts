@@ -193,6 +193,7 @@ export interface BookingPayload {
   timezone?: string;
   message?: string;
   amount?: number;
+  referralCode?: string;
 }
 
 export interface Booking {
@@ -255,11 +256,94 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'superadmin' | 'admin' | 'editor' | 'user';
+  role: 'superadmin' | 'admin' | 'editor' | 'user' | 'partner' | 'PARTNER';
 }
 
 export interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+}
+
+export interface PartnerLink {
+  id?: string;
+  _id?: string;
+  code: string;
+  resourceId?: string;
+  resourceTitle?: string;
+  targetUrl: string;
+  fullUrl: string;
+  clicksCount: number;
+  viewsCount: number;
+  salesCount: number;
+  revenueGenerated: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface Partner {
+  _id: string;
+  id?: string;
+  userId: string;
+  name: string;
+  email: string;
+  phone?: string;
+  status: 'ACTIVE' | 'DISABLED';
+  notes?: string;
+  linksCount: number;
+  totalClicks: number;
+  totalSales: number;
+  totalRevenue: number;
+  conversionRate: string;
+  links: PartnerLink[];
+  stats?: {
+    totalClicks: number;
+    uniqueVisitors: number;
+    totalPurchases: number;
+    totalRevenue: number;
+  };
+  createdAt: string;
+}
+
+export interface PartnerDashboardData {
+  partner: {
+    id: string;
+    name: string;
+    email: string;
+    status: string;
+  };
+  metrics: {
+    totalClicks: number;
+    uniqueVisitors: number;
+    resourceViews: number;
+    purchases: number;
+    revenueGenerated: number;
+    conversionRate: string;
+  };
+  links: PartnerLink[];
+}
+
+export interface PartnerLead {
+  _id: string;
+  customerName: string;
+  customerEmail: string;
+  itemTitle: string;
+  amount: number;
+  currency: string;
+  status: string;
+  paymentStatus: string;
+  referralCode: string;
+  createdAt: string;
+}
+
+export interface CreatePartnerPayload {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  initialCode?: string;
+  referralCode?: string;
+  resourceId?: string;
+  initialResourceId?: string;
+  notes?: string;
 }

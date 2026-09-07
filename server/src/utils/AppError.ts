@@ -14,6 +14,8 @@ export type ErrorCode =
   | 'RESOURCE_ACCESS_DENIED'
   | 'BOOKING_ERROR'
   | 'LEAD_ERROR'
+  | 'REFERRAL_ERROR'
+  | 'ACCOUNT_DISABLED'
   | 'INTERNAL_SERVER_ERROR';
 
 export class AppError extends Error {

@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import { Resource } from '../resources/model.js';
 import { Order, IOrder } from '../orders/model.js';
 import { Booking } from '../bookings/model.js';
+import { ReferralPartner } from '../referrals/model.js';
+import { ReferralService } from '../referrals/service.js';
 import { getPaymentProvider } from './provider.js';
 import { AppError } from '../../utils/AppError.js';
 import { ORDER_STATUS, BOOKING_STATUS } from '../../config/constants.js';
@@ -14,6 +16,7 @@ export class PaymentService {
     userEmail: string;
     userName?: string;
     userPhone?: string;
+    referralCode?: string;
   }): Promise<{
     orderId: string;
     providerOrderId: string;
@@ -32,6 +35,18 @@ export class PaymentService {
       throw new AppError('Free resources do not require payment checkout', 400, 'VALIDATION_ERROR');
     }
 
+    // Check referral partner attribution if referralCode provided
+    let partnerId: any = undefined;
+    let refCode: string | undefined = undefined;
+
+    if (data.referralCode) {
+      refCode = data.referralCode.toUpperCase().trim();
+      const partner = await ReferralPartner.findOne({ 'links.code': refCode, status: 'ACTIVE' });
+      if (partner) {
+        partnerId = partner.userId;
+      }
+    }
+
     // Create DB Order in CREATED status
     const order = await Order.create({
       userEmail: data.userEmail.toLowerCase(),
@@ -41,6 +56,8 @@ export class PaymentService {
       amount: resource.price,
       currency: resource.currency,
       status: ORDER_STATUS.CREATED,
+      partnerId,
+      referralCode: refCode,
     });
 
     const provider = getPaymentProvider();
@@ -119,6 +136,11 @@ export class PaymentService {
     order.downloadExpiresAt = downloadExpiresAt;
     await order.save();
 
+    // Increment partner sales count and revenue if referral attributed
+    if (order.referralCode) {
+      await ReferralService.attributeVerifiedOrder(order.referralCode, order.amount).catch(() => {});
+    }
+
     // Increment resource download/purchase count
     await Resource.findByIdAndUpdate(order.resourceId, { $inc: { downloadCount: 1 } });
 
@@ -140,6 +162,7 @@ export class PaymentService {
     timezone?: string;
     message?: string;
     amount?: number;
+    referralCode?: string;
   }): Promise<{
     bookingId: string;
     orderId: string;
@@ -150,6 +173,17 @@ export class PaymentService {
     keyId: string;
   }> {
     const bookingAmount = data.amount || 999;
+
+    let partnerId: any = undefined;
+    let refCode: string | undefined = undefined;
+
+    if (data.referralCode) {
+      refCode = data.referralCode.toUpperCase().trim();
+      const partner = await ReferralPartner.findOne({ 'links.code': refCode, status: 'ACTIVE' });
+      if (partner) {
+        partnerId = partner.userId;
+      }
+    }
 
     // Create Booking record in PENDING payment status
     const booking = await Booking.create({
@@ -166,6 +200,8 @@ export class PaymentService {
       currency: 'INR',
       status: BOOKING_STATUS.PENDING,
       paymentStatus: 'PENDING',
+      partnerId,
+      referralCode: refCode,
     });
 
     const provider = getPaymentProvider();
@@ -238,6 +274,8 @@ export class PaymentService {
         userName: booking.name,
         userPhone: booking.phone,
         bookingId: booking._id,
+        partnerId: booking.partnerId,
+        referralCode: booking.referralCode,
         orderType: 'STRATEGY_BOOKING',
         amount: booking.amount,
         currency: booking.currency,
@@ -253,6 +291,10 @@ export class PaymentService {
           type: '1-on-1 Growth Consultation Session',
         },
       });
+
+      if (booking.referralCode) {
+        await ReferralService.attributeVerifiedOrder(booking.referralCode, booking.amount).catch(() => {});
+      }
     } catch (orderErr) {
       console.warn('Warning creating order record for booking:', orderErr);
     }

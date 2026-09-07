@@ -19,6 +19,8 @@ export interface IBooking extends Document {
   providerOrderId?: string;
   providerPaymentId?: string;
   providerSignature?: string;
+  partnerId?: mongoose.Types.ObjectId;
+  referralCode?: string;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -47,10 +49,12 @@ const bookingSchema = new Schema<IBooking>(
       enum: ['PENDING', 'PAID', 'FAILED', 'REFUNDED'],
       default: 'PENDING',
     },
-    provider: { type: String, default: 'razorpay' },
+    provider: { type: String },
     providerOrderId: { type: String },
     providerPaymentId: { type: String },
     providerSignature: { type: String },
+    partnerId: { type: Schema.Types.ObjectId, ref: 'User' },
+    referralCode: { type: String, uppercase: true, trim: true },
     notes: { type: String },
   },
   {
@@ -58,7 +62,9 @@ const bookingSchema = new Schema<IBooking>(
   }
 );
 
-bookingSchema.index({ status: 1, createdAt: -1 });
 bookingSchema.index({ email: 1 });
+bookingSchema.index({ preferredDate: 1 });
+bookingSchema.index({ partnerId: 1 });
+bookingSchema.index({ referralCode: 1 });
 
 export const Booking = mongoose.model<IBooking>('Booking', bookingSchema);

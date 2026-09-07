@@ -16,15 +16,18 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { SignupPage } from './pages/auth/SignupPage';
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { PartnerDashboardPage } from './pages/partner/PartnerDashboardPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { TermsPage } from './pages/TermsPage';
 import { AuthProvider } from './context/AuthContext';
 import { getSiteSettings, defaultSiteSettings } from './services/api';
 import { SiteSettings } from './types';
+import { useReferralAttribution } from './hooks/useReferralAttribution';
 
 const LayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  useReferralAttribution();
   const location = useLocation();
-  const isAdminDashboard = location.pathname === '/admin';
+  const isDashboard = location.pathname === '/admin' || location.pathname === '/partner/dashboard';
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSiteSettings);
 
   useEffect(() => {
@@ -35,11 +38,11 @@ const LayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   return (
     <>
-      {!isAdminDashboard && <Navbar />}
-      <div style={{ paddingTop: !isAdminDashboard && !isHomePage ? '84px' : 0 }}>
+      {!isDashboard && <Navbar />}
+      <div style={{ paddingTop: !isDashboard && !isHomePage ? '84px' : 0 }}>
         {children}
       </div>
-      {!isAdminDashboard && <Footer settings={siteSettings.footer} />}
+      {!isDashboard && <Footer settings={siteSettings.footer} />}
     </>
   );
 };
@@ -63,6 +66,8 @@ export const App: React.FC = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/partner/login" element={<AdminLoginPage />} />
+            <Route path="/partner/dashboard" element={<PartnerDashboardPage />} />
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsPage />} />

@@ -6,6 +6,7 @@ export const checkoutSchema = z.object({
     userEmail: z.string().email('Valid email address is required'),
     userName: z.string().optional(),
     userPhone: z.string().optional(),
+    referralCode: z.string().optional(),
   }),
 });
 
@@ -29,6 +30,7 @@ export const bookingCheckoutSchema = z.object({
     timezone: z.string().default('IST (UTC+5:30)'),
     message: z.string().optional(),
     amount: z.number().default(999),
+    referralCode: z.string().optional(),
   }),
 });
 

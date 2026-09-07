@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, Clock, Send, CheckCircle2, AlertCircle, Sparkles, ShieldCheck, Lock, CreditCard } from 'lucide-react';
 import { BookingSectionSettings, BookingPayload } from '../../types';
 import { initiateBookingCheckout, verifyBookingPayment } from '../../services/api';
+import { getActiveReferralCode } from '../../hooks/useReferralAttribution';
 
 interface BookCallSectionProps {
   settings?: BookingSectionSettings;
@@ -90,7 +91,8 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
       const payload: BookingPayload = {
         ...formData,
         amount: 999,
-        message: [formData.message, socialLink ? `Social / Website: ${socialLink}` : ''].filter(Boolean).join('\n')
+        message: [formData.message, socialLink ? `Social / Website: ${socialLink}` : ''].filter(Boolean).join('\n'),
+        referralCode: getActiveReferralCode() || undefined
       };
 
       const checkoutRes = await initiateBookingCheckout(payload);

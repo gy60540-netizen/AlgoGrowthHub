@@ -795,6 +795,85 @@ Chronological event log containing `actorUserId`, `action`, `resourceType`, `ipA
 
 ---
 
+### 13. Partner Referral Tracking & Isolated Partner Portal
+
+#### 13.1 Create Partner Account (Admin Only)
+* **Method:** `POST`
+* **Route:** `/api/v1/admin/partners`
+* **Auth:** Admin / Super Admin
+* **Description:** Manually provisions a partner user account (password hashed with bcrypt 12 rounds) and initial resource referral link.
+
+**Request Body:**
+```json
+{
+  "name": "Aman Verma",
+  "email": "aman@gmail.com",
+  "password": "AmanSecretPassword123",
+  "phone": "+919876543210",
+  "initialCode": "AMAN123",
+  "resourceId": "6a8ec60c9d444f368a9a8ff4",
+  "notes": "Instagram growth creator partner"
+}
+```
+
+#### 13.2 List All Partners (Admin Only)
+* **Method:** `GET`
+* **Route:** `/api/v1/admin/partners`
+* **Auth:** Admin / Super Admin
+* **Response:** Array of partners with aggregated links, clicks, verified sales, and total revenue.
+
+#### 13.3 Add Resource Referral Link to Partner (Admin Only)
+* **Method:** `POST`
+* **Route:** `/api/v1/admin/partners/:id/links`
+* **Auth:** Admin / Super Admin
+
+**Request Body:**
+```json
+{
+  "code": "AMAN456",
+  "resourceId": "6a8ec60c9d444f368a9a8ff5"
+}
+```
+
+#### 13.4 Enable / Disable Partner (Admin Only)
+* **Method:** `PATCH`
+* **Route:** `/api/v1/admin/partners/:id/status`
+* **Auth:** Admin / Super Admin
+
+**Request Body:**
+```json
+{
+  "status": "DISABLED"
+}
+```
+
+#### 13.5 Partner Self Dashboard (Partner Only)
+* **Method:** `GET`
+* **Route:** `/api/v1/partner/dashboard`
+* **Auth:** Authenticated Partner (`PARTNER` role required, strictly scoped to `req.user.userId`)
+* **Response:** Partner's own metrics (Total Clicks, Unique Visitors, Resource Views, Verified Purchases, Total Revenue, Conversion Rate) and assigned referral links.
+
+#### 13.6 Partner Self Attributed Leads & Orders (Partner Only)
+* **Method:** `GET`
+* **Route:** `/api/v1/partner/leads`
+* **Auth:** Authenticated Partner (`PARTNER` role required)
+* **Response:** Live list of verified orders with masked customer privacy (`Rahul V****`, `r***@gmail.com`, item title, amount, and timestamp).
+
+#### 13.7 Public Referral Click Tracking
+* **Method:** `POST`
+* **Route:** `/api/v1/referrals/track`
+* **Auth:** Public
+* **Request Body:**
+```json
+{
+  "code": "AMAN123",
+  "landingPath": "/resources/instagram-growth-guide",
+  "visitorId": "vis_8f4a1c29"
+}
+```
+
+---
+
 ## 8. Multi-Scenario Error Handling & Edge Cases
 
 ### Scenario A: Duplicate Registration Attempt

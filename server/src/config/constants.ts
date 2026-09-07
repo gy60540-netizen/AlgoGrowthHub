@@ -2,6 +2,7 @@ export const ROLES = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN: 'ADMIN',
   USER: 'USER',
+  PARTNER: 'PARTNER',
 } as const;
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
@@ -53,6 +54,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   SUPER_ADMIN: Object.values(PERMISSIONS),
   ADMIN: Object.values(PERMISSIONS),
   USER: [],
+  PARTNER: [],
 };
 
 export const CONTENT_STATUS = {

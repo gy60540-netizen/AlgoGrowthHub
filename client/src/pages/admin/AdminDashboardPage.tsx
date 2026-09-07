@@ -28,7 +28,15 @@ import {
   CreditCard,
   DollarSign,
   Loader2,
-  Upload
+  Upload,
+  Share2,
+  UserPlus,
+  Link2,
+  Copy,
+  CheckCircle2,
+  Shield,
+  Eye,
+  TrendingUp
 } from 'lucide-react';
 import { 
   getSiteSettings, 
@@ -55,6 +63,10 @@ import {
   deleteAdminClientResult,
   getAdminOrders,
   refundAdminOrder,
+  getAdminPartners,
+  createAdminPartner,
+  addPartnerResourceLink,
+  togglePartnerStatus,
   defaultSiteSettings,
   defaultServices,
   defaultCreators,
@@ -70,12 +82,13 @@ import {
   ExpertTeamMember, 
   ClientResult, 
   Resource,
-  Lead
+  Lead,
+  Partner
 } from '../../types';
 
 export const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'hero' | 'services' | 'creators' | 'team' | 'clients' | 'resources' | 'bookings' | 'creator-apps' | 'orders'>('hero');
+  const [activeTab, setActiveTab] = useState<'hero' | 'services' | 'creators' | 'team' | 'clients' | 'resources' | 'bookings' | 'creator-apps' | 'orders' | 'partners'>('hero');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSiteSettings);
   const [services, setServices] = useState<Service[]>(defaultServices);
   const [creators, setCreators] = useState<Creator[]>(defaultCreators);
@@ -85,9 +98,18 @@ export const AdminDashboardPage: React.FC = () => {
   const [bookings, setBookings] = useState<any[]>([]);
   const [creatorApplications, setCreatorApplications] = useState<Lead[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [partnerSummary, setPartnerSummary] = useState({
+    totalPartners: 0,
+    activePartners: 0,
+    totalClicks: 0,
+    totalSales: 0,
+    totalRevenue: 0
+  });
   const [loadingBookings, setLoadingBookings] = useState(false);
   const [loadingApps, setLoadingApps] = useState(false);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingPartners, setLoadingPartners] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Modals State
@@ -95,6 +117,24 @@ export const AdminDashboardPage: React.FC = () => {
   const [isCreatorModalOpen, setIsCreatorModalOpen] = useState(false);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+  const [isAddPartnerModalOpen, setIsAddPartnerModalOpen] = useState(false);
+  const [isAddLinkModalOpen, setIsAddLinkModalOpen] = useState(false);
+  const [selectedPartnerForLink, setSelectedPartnerForLink] = useState<Partner | null>(null);
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
+
+  // Partner Forms State
+  const [newPartnerForm, setNewPartnerForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    initialResourceId: '',
+    referralCode: ''
+  });
+
+  const [newLinkForm, setNewLinkForm] = useState({
+    resourceId: '',
+    customCode: ''
+  });
 
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState('');
@@ -212,6 +252,18 @@ export const AdminDashboardPage: React.FC = () => {
     setLoadingOrders(false);
   };
 
+  const fetchLivePartners = async () => {
+    setLoadingPartners(true);
+    const res = await getAdminPartners();
+    if (res.success && res.data) {
+      setPartners(res.data.partners || []);
+      if (res.data.summary) {
+        setPartnerSummary(res.data.summary);
+      }
+    }
+    setLoadingPartners(false);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -229,8 +281,86 @@ export const AdminDashboardPage: React.FC = () => {
       fetchLiveBookings(),
       fetchLiveApplications(),
       fetchLiveOrders(),
+      fetchLivePartners(),
     ]);
   }, [navigate]);
+
+  const handleCreatePartnerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setModalLoading(true);
+    setModalError('');
+
+    const res = await createAdminPartner({
+      name: newPartnerForm.name,
+      email: newPartnerForm.email,
+      password: newPartnerForm.password,
+      initialResourceId: newPartnerForm.initialResourceId || undefined,
+      referralCode: newPartnerForm.referralCode || undefined,
+    });
+
+    setModalLoading(false);
+    if (res.success) {
+      setIsAddPartnerModalOpen(false);
+      setNewPartnerForm({
+        name: '',
+        email: '',
+        password: '',
+        initialResourceId: '',
+        referralCode: ''
+      });
+      fetchLivePartners();
+    } else {
+      setModalError(res.message || 'Failed to create partner account');
+    }
+  };
+
+  const handleAddLinkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPartnerForLink) return;
+
+    setModalLoading(true);
+    setModalError('');
+
+    const partnerId = selectedPartnerForLink._id || selectedPartnerForLink.id || '';
+    const res = await addPartnerResourceLink(
+      partnerId,
+      newLinkForm.resourceId,
+      newLinkForm.customCode || undefined
+    );
+
+    setModalLoading(false);
+    if (res.success) {
+      setIsAddLinkModalOpen(false);
+      setSelectedPartnerForLink(null);
+      setNewLinkForm({ resourceId: '', customCode: '' });
+      fetchLivePartners();
+    } else {
+      setModalError(res.message || 'Failed to generate partner resource link');
+    }
+  };
+
+  const handleTogglePartner = async (partnerId: string, currentStatus: string) => {
+    const nextStatus = currentStatus === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
+    const confirmMsg = nextStatus === 'DISABLED' 
+      ? 'Disable this partner? They will not be able to log in to their dashboard and their links will be deactivated.'
+      : 'Reactivate this partner?';
+    if (!window.confirm(confirmMsg)) return;
+
+    const res = await togglePartnerStatus(partnerId, nextStatus as 'ACTIVE' | 'DISABLED');
+    if (res.success) {
+      fetchLivePartners();
+    } else {
+      alert(res.message || 'Failed to update partner status');
+    }
+  };
+
+  const handleCopyLink = (targetUrl: string, linkId: string) => {
+    const origin = window.location.origin;
+    const fullUrl = targetUrl.startsWith('http') ? targetUrl : `${origin}${targetUrl.startsWith('/') ? '' : '/'}${targetUrl}`;
+    navigator.clipboard.writeText(fullUrl);
+    setCopiedLinkId(linkId);
+    setTimeout(() => setCopiedLinkId(null), 2500);
+  };
 
   const handleRefundOrder = async (orderId: string) => {
     const reason = window.prompt('Enter reason for refund:');
@@ -550,6 +680,7 @@ export const AdminDashboardPage: React.FC = () => {
             { id: 'resources', label: `Resources & Kits (${resources.length})`, icon: <BookOpen size={18} /> },
             { id: 'bookings', label: `Strategy Bookings (${bookings.length})`, icon: <Calendar size={18} /> },
             { id: 'orders', label: `Orders & Revenue (${orders.length})`, icon: <CreditCard size={18} /> },
+            { id: 'partners', label: `Partners & Referrals (${partners.length})`, icon: <Share2 size={18} /> },
           ].map((item) => {
             const isActive = activeTab === item.id;
             return (
@@ -583,7 +714,12 @@ export const AdminDashboardPage: React.FC = () => {
           })}
         </nav>
 
-        <div style={{ paddingTop: '1.5rem', borderTop: '1px solid var(--color-bg-dark-border)' }}>
+        {/* User Info & Logout */}
+        <div style={{ paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>Super Administrator</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--color-text-light-muted)' }}>Admin CMS Controls</div>
+          </div>
           <button
             onClick={handleLogout}
             style={{
@@ -595,7 +731,7 @@ export const AdminDashboardPage: React.FC = () => {
               border: 'none',
               cursor: 'pointer',
               fontSize: '0.85rem',
-              fontWeight: 600,
+              padding: 0,
             }}
           >
             <LogOut size={16} />
@@ -618,6 +754,8 @@ export const AdminDashboardPage: React.FC = () => {
               {activeTab === 'clients' && `Client Before & After Showcase (${clientResults.length})`}
               {activeTab === 'resources' && `Digital Resources, Playbooks & Growth Kits (${resources.length})`}
               {activeTab === 'bookings' && `Live Strategy Inquiries & Consultation Bookings (${bookings.length})`}
+              {activeTab === 'orders' && `Live Orders & Digital Sales Stream (${orders.length})`}
+              {activeTab === 'partners' && `Partner Referral Tracking & Isolated Portals (${partners.length})`}
             </h1>
             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
               All modifications preserve strict PRD aspect ratios, verified links, and geometry.
@@ -688,6 +826,27 @@ export const AdminDashboardPage: React.FC = () => {
                 <RefreshCw size={15} className={loadingBookings ? 'animate-spin' : ''} />
                 <span>Refresh Bookings</span>
               </button>
+            )}
+
+            {activeTab === 'partners' && (
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button 
+                  onClick={fetchLivePartners} 
+                  className="btn btn-secondary btn-sm"
+                  style={{ padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                >
+                  <RefreshCw size={15} className={loadingPartners ? 'animate-spin' : ''} />
+                  <span>Refresh Partners</span>
+                </button>
+                <button 
+                  onClick={() => { setIsAddPartnerModalOpen(true); setModalError(''); }} 
+                  className="btn btn-primary btn-sm"
+                  style={{ padding: '0.75rem 1.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                >
+                  <UserPlus size={16} />
+                  <span>Add New Partner</span>
+                </button>
+              </div>
             )}
 
             <button 
@@ -1634,6 +1793,388 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         )}
 
+        {/* Tab 9: Partners & Referral Tracking System */}
+        {activeTab === 'partners' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Top KPI Summary */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '1.25rem',
+              }}
+            >
+              {/* KPI 1: Partners */}
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  padding: '1.5rem',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(226, 232, 240, 0.5)',
+                  boxShadow: '0 16px 36px -6px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+                    Total Partners
+                  </span>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: '#EEF2FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4F46E5' }}>
+                    <Users size={20} />
+                  </div>
+                </div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.85rem', fontWeight: 900, color: '#0F172A' }}>
+                  {partnerSummary.totalPartners}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 700, marginTop: '0.35rem' }}>
+                  {partnerSummary.activePartners} Active Partners
+                </div>
+              </div>
+
+              {/* KPI 2: Referral Clicks */}
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  padding: '1.5rem',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(226, 232, 240, 0.5)',
+                  boxShadow: '0 16px 36px -6px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+                    Referral Clicks
+                  </span>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563EB' }}>
+                    <TrendingUp size={20} />
+                  </div>
+                </div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.85rem', fontWeight: 900, color: '#0F172A' }}>
+                  {partnerSummary.totalClicks.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600, marginTop: '0.35rem' }}>
+                  Total Visitors via Partners
+                </div>
+              </div>
+
+              {/* KPI 3: Attributed Purchases */}
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  padding: '1.5rem',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(226, 232, 240, 0.5)',
+                  boxShadow: '0 16px 36px -6px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+                    Partner Sales
+                  </span>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D97706' }}>
+                    <Award size={20} />
+                  </div>
+                </div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.85rem', fontWeight: 900, color: '#0F172A' }}>
+                  {partnerSummary.totalSales}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600, marginTop: '0.35rem' }}>
+                  Verified Paid Conversions
+                </div>
+              </div>
+
+              {/* KPI 4: Partner Generated Revenue */}
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  padding: '1.5rem',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(226, 232, 240, 0.5)',
+                  boxShadow: '0 16px 36px -6px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+                    Partner Revenue
+                  </span>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', backgroundColor: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
+                    <DollarSign size={20} />
+                  </div>
+                </div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.85rem', fontWeight: 900, color: '#0F172A' }}>
+                  ₹{partnerSummary.totalRevenue.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 700, marginTop: '0.35rem' }}>
+                  Total Digital Sales Value
+                </div>
+              </div>
+            </div>
+
+            {/* Partners List / Cards */}
+            {loadingPartners ? (
+              <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--color-text-secondary)' }}>
+                <Loader2 size={32} className="animate-spin" style={{ margin: '0 auto 1rem auto' }} />
+                <p>Loading partners and referral analytics...</p>
+              </div>
+            ) : partners.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '4rem 2rem', backgroundColor: '#FFFFFF', borderRadius: '20px', border: '1px solid rgba(226, 232, 240, 0.6)', boxShadow: '0 16px 36px -6px rgba(15, 23, 42, 0.08)' }}>
+                <Share2 size={48} color="#94A3B8" style={{ margin: '0 auto 1rem auto' }} />
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', fontWeight: 800, color: '#0F172A', marginBottom: '0.35rem' }}>
+                  No Partners Created Yet
+                </h3>
+                <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '440px', margin: '0 auto 1.5rem auto' }}>
+                  Partners can only be added by you (the Admin). Create a partner with their email and password, and generate tracking links for specific resources.
+                </p>
+                <button
+                  onClick={() => { setIsAddPartnerModalOpen(true); setModalError(''); }}
+                  className="btn btn-primary btn-sm"
+                  style={{ padding: '0.75rem 1.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  <UserPlus size={16} />
+                  <span>Create First Partner</span>
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {partners.map((partner) => {
+                  const partnerId = partner._id || partner.id || '';
+                  const isActive = partner.status === 'ACTIVE';
+                  const totalClicks = partner.stats?.totalClicks || 0;
+                  const totalPurchases = partner.stats?.totalPurchases || 0;
+                  const totalRevenue = partner.stats?.totalRevenue || 0;
+                  const uniqueVisitors = partner.stats?.uniqueVisitors || 0;
+                  const conversionRate = totalClicks > 0 ? ((totalPurchases / totalClicks) * 100).toFixed(1) : '0.0';
+
+                  return (
+                    <div
+                      key={partnerId}
+                      style={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '20px',
+                        border: '1px solid rgba(226, 232, 240, 0.7)',
+                        boxShadow: '0 16px 36px -6px rgba(15, 23, 42, 0.06)',
+                        padding: '1.75rem',
+                      }}
+                    >
+                      {/* Partner Card Top Bar */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          gap: '1rem',
+                          paddingBottom: '1.25rem',
+                          borderBottom: '1px solid #F1F5F9',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <div
+                            style={{
+                              width: '44px',
+                              height: '44px',
+                              borderRadius: '12px',
+                              backgroundColor: isActive ? '#EEF2FF' : '#F1F5F9',
+                              color: isActive ? '#4F46E5' : '#94A3B8',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 800,
+                              fontSize: '1.1rem',
+                            }}
+                          >
+                            {partner.name?.charAt(0)?.toUpperCase() || 'P'}
+                          </div>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                                {partner.name}
+                              </h3>
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.25rem',
+                                  padding: '0.2rem 0.6rem',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 800,
+                                  backgroundColor: isActive ? '#ECFDF5' : '#FEF2F2',
+                                  color: isActive ? '#059669' : '#DC2626',
+                                  border: `1px solid ${isActive ? '#A7F3D0' : '#FECACA'}`,
+                                }}
+                              >
+                                {isActive ? 'ACTIVE PARTNER' : 'DISABLED'}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '0.82rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
+                              <Mail size={13} />
+                              <span>{partner.email}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                          <button
+                            onClick={() => {
+                              setSelectedPartnerForLink(partner);
+                              setIsAddLinkModalOpen(true);
+                              setModalError('');
+                            }}
+                            className="btn btn-secondary btn-sm"
+                            style={{ padding: '0.45rem 0.9rem', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                          >
+                            <Link2 size={14} />
+                            <span>+ Add Resource Link</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleTogglePartner(partnerId, partner.status)}
+                            className="btn btn-secondary btn-sm"
+                            style={{
+                              padding: '0.45rem 0.85rem',
+                              fontSize: '0.82rem',
+                              color: isActive ? '#DC2626' : '#059669',
+                              borderColor: isActive ? '#FECACA' : '#A7F3D0',
+                            }}
+                          >
+                            {isActive ? 'Disable' : 'Activate'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Partner Stats Summary Strip */}
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                          gap: '0.75rem',
+                          margin: '1.25rem 0',
+                          padding: '1rem',
+                          backgroundColor: '#F8FAFC',
+                          borderRadius: '12px',
+                          border: '1px solid #E2E8F0',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Total Clicks</div>
+                          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: 900, color: '#0F172A' }}>
+                            {totalClicks}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Unique Visitors</div>
+                          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: 900, color: '#0F172A' }}>
+                            {uniqueVisitors}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Verified Sales</div>
+                          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: 900, color: '#059669' }}>
+                            {totalPurchases}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Revenue Generated</div>
+                          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: 900, color: '#0F172A' }}>
+                            ₹{totalRevenue.toLocaleString()}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Conversion Rate</div>
+                          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: 900, color: '#4F46E5' }}>
+                            {conversionRate}%
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Assigned Resource Links Table */}
+                      <div>
+                        <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#334155', marginBottom: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <Link2 size={15} color="#4F46E5" />
+                          <span>Assigned Resource Tracking Links ({partner.links?.length || 0})</span>
+                        </div>
+
+                        {(!partner.links || partner.links.length === 0) ? (
+                          <div style={{ padding: '1.25rem', backgroundColor: '#F8FAFC', borderRadius: '10px', textAlign: 'center', color: '#64748B', fontSize: '0.85rem', border: '1px dashed #CBD5E1' }}>
+                            No resource links assigned yet. Click <strong>"+ Add Resource Link"</strong> above to generate a trackable referral URL.
+                          </div>
+                        ) : (
+                          <div style={{ overflowX: 'auto', border: '1px solid #E2E8F0', borderRadius: '10px' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+                              <thead>
+                                <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0', textAlign: 'left' }}>
+                                  <th style={{ padding: '0.65rem 0.85rem', color: '#475569', fontWeight: 700 }}>Resource Title</th>
+                                  <th style={{ padding: '0.65rem 0.85rem', color: '#475569', fontWeight: 700 }}>Referral Code</th>
+                                  <th style={{ padding: '0.65rem 0.85rem', color: '#475569', fontWeight: 700 }}>Shareable Tracking URL</th>
+                                  <th style={{ padding: '0.65rem 0.85rem', color: '#475569', fontWeight: 700, textAlign: 'center' }}>Clicks</th>
+                                  <th style={{ padding: '0.65rem 0.85rem', color: '#475569', fontWeight: 700, textAlign: 'center' }}>Sales</th>
+                                  <th style={{ padding: '0.65rem 0.85rem', color: '#475569', fontWeight: 700, textAlign: 'right' }}>Revenue</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {partner.links.map((link) => {
+                                  const linkKey = link._id || link.code;
+                                  const isCopied = copiedLinkId === linkKey;
+                                  return (
+                                    <tr key={linkKey} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                                      <td style={{ padding: '0.75rem 0.85rem', fontWeight: 700, color: '#0F172A' }}>
+                                        {link.resourceTitle || 'General Resource'}
+                                      </td>
+                                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                                        <code style={{ backgroundColor: '#EEF2FF', color: '#4F46E5', padding: '0.2rem 0.45rem', borderRadius: '6px', fontWeight: 800 }}>
+                                          {link.code}
+                                        </code>
+                                      </td>
+                                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                          <span style={{ maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#64748B', fontFamily: 'monospace', fontSize: '0.78rem' }}>
+                                            {link.targetUrl}
+                                          </span>
+                                          <button
+                                            onClick={() => handleCopyLink(link.targetUrl, linkKey)}
+                                            className="btn btn-secondary btn-sm"
+                                            style={{
+                                              padding: '0.25rem 0.55rem',
+                                              fontSize: '0.72rem',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '0.25rem',
+                                              backgroundColor: isCopied ? '#ECFDF5' : '#FFFFFF',
+                                              color: isCopied ? '#059669' : '#0F172A',
+                                              borderColor: isCopied ? '#A7F3D0' : '#E2E8F0',
+                                            }}
+                                          >
+                                            {isCopied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
+                                            <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                                          </button>
+                                        </div>
+                                      </td>
+                                      <td style={{ padding: '0.75rem 0.85rem', textAlign: 'center', fontWeight: 700, color: '#0F172A' }}>
+                                        {link.clicksCount || 0}
+                                      </td>
+                                      <td style={{ padding: '0.75rem 0.85rem', textAlign: 'center', fontWeight: 800, color: '#059669' }}>
+                                        {link.salesCount || 0}
+                                      </td>
+                                      <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right', fontWeight: 800, color: '#0F172A' }}>
+                                        ₹{(link.revenueGenerated || 0).toLocaleString()}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Modal 1: Add New Creator (Instagram ONLY) */}
         {isCreatorModalOpen && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1.5rem' }}>
@@ -1918,6 +2459,164 @@ export const AdminDashboardPage: React.FC = () => {
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
                   <button type="button" onClick={() => setIsResourceModalOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
                   <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm" style={{ padding: '0.65rem 1.4rem' }}>{modalLoading ? 'Publishing...' : 'Publish Resource Live'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 5: Add New Partner Account */}
+        {isAddPartnerModalOpen && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1.5rem' }}>
+            <div className="hub-card" style={{ width: '100%', maxWidth: '540px', backgroundColor: 'var(--color-white)', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <UserPlus size={22} color="#4F46E5" />
+                  <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Create Partner Account</h2>
+                </div>
+                <button onClick={() => setIsAddPartnerModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div style={{ backgroundColor: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '0.85rem 1rem', marginBottom: '1.25rem', fontSize: '0.82rem', color: '#3730A3' }}>
+                <strong>Admin-Exclusive Partner Setup:</strong> Partners do not have self-registration. Once you create this account, provide the email and password to the partner. They will log in using <strong>"Login as Partner"</strong> to access their isolated tracking dashboard.
+              </div>
+
+              {modalError && <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', marginBottom: '1rem' }}>{modalError}</div>}
+
+              <form onSubmit={handleCreatePartnerSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Partner Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Aman Sharma"
+                    value={newPartnerForm.name}
+                    onChange={e => setNewPartnerForm({ ...newPartnerForm, name: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Partner Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. aman@gmail.com"
+                    value={newPartnerForm.email}
+                    onChange={e => setNewPartnerForm({ ...newPartnerForm, email: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Partner Initial Password *</label>
+                  <input
+                    type="text"
+                    required
+                    minLength={6}
+                    placeholder="e.g. Aman@12345"
+                    value={newPartnerForm.password}
+                    onChange={e => setNewPartnerForm({ ...newPartnerForm, password: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }}
+                  />
+                  <span style={{ fontSize: '0.75rem', color: '#64748B', display: 'block', marginTop: '0.25rem' }}>
+                    Password is securely hashed via bcrypt. Share this with the partner for portal login.
+                  </span>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Assign Initial Resource (Optional)</label>
+                  <select
+                    value={newPartnerForm.initialResourceId}
+                    onChange={e => setNewPartnerForm({ ...newPartnerForm, initialResourceId: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none', backgroundColor: '#FFFFFF' }}
+                  >
+                    <option value="">-- Select a Resource to Generate Link --</option>
+                    {resources.map((res) => (
+                      <option key={res._id || res.id} value={res._id || res.id}>
+                        {res.title} ({res.type === 'premium' ? `₹${res.price}` : 'Free'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Custom Referral Code (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. AMAN123 (Leave empty for auto-generation)"
+                    value={newPartnerForm.referralCode}
+                    onChange={e => setNewPartnerForm({ ...newPartnerForm, referralCode: e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, '') })}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none', fontFamily: 'monospace' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button type="button" onClick={() => setIsAddPartnerModalOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
+                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Creating...' : 'Create Partner Account'}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal 6: Add Resource Link to Existing Partner */}
+        {isAddLinkModalOpen && selectedPartnerForLink && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1.5rem' }}>
+            <div className="hub-card" style={{ width: '100%', maxWidth: '520px', backgroundColor: 'var(--color-white)', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Link2 size={22} color="#4F46E5" />
+                  <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Assign Resource Link</h2>
+                </div>
+                <button onClick={() => { setIsAddLinkModalOpen(false); setSelectedPartnerForLink(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '0.85rem', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
+                Assigning referral tracking link for: <strong>{selectedPartnerForLink.name}</strong> ({selectedPartnerForLink.email})
+              </div>
+
+              {modalError && <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', marginBottom: '1rem' }}>{modalError}</div>}
+
+              <form onSubmit={handleAddLinkSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Select Target Resource *</label>
+                  <select
+                    required
+                    value={newLinkForm.resourceId}
+                    onChange={e => setNewLinkForm({ ...newLinkForm, resourceId: e.target.value })}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none', backgroundColor: '#FFFFFF' }}
+                  >
+                    <option value="">-- Choose Resource --</option>
+                    {resources.map((res) => (
+                      <option key={res._id || res.id} value={res._id || res.id}>
+                        {res.title} ({res.type === 'premium' ? `₹${res.price}` : 'Free'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Custom Referral Code (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. AMAN_REELS (Leave empty for auto-generated)"
+                    value={newLinkForm.customCode}
+                    onChange={e => setNewLinkForm({ ...newLinkForm, customCode: e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, '') })}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none', fontFamily: 'monospace' }}
+                  />
+                  <span style={{ fontSize: '0.75rem', color: '#64748B', display: 'block', marginTop: '0.25rem' }}>
+                    Will be appended to resource URL as: ?ref=CODE
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button type="button" onClick={() => { setIsAddLinkModalOpen(false); setSelectedPartnerForLink(null); }} className="btn btn-secondary btn-sm">Cancel</button>
+                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Generating...' : 'Generate & Assign Link'}</button>
                 </div>
               </form>
             </div>
