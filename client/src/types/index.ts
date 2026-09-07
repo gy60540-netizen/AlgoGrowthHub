@@ -167,7 +167,11 @@ export interface Resource {
   slug: string;
   thumbnail: string;
   fileKey?: string;
+  fileName?: string;
+  fileFormat?: 'pdf' | 'zip' | 'mp4';
+  fileSize?: number;
   fileUrl?: string;
+  downloadCount?: number;
   type: 'free' | 'premium';
   price?: number;
   currency?: string;

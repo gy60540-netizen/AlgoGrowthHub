@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Settings, 
@@ -27,7 +27,8 @@ import {
   Star,
   CreditCard,
   DollarSign,
-  Loader2
+  Loader2,
+  Upload
 } from 'lucide-react';
 import { 
   getSiteSettings, 
@@ -43,6 +44,7 @@ import {
   deleteAdminLead,
   updateAdminService,
   updateAdminSiteSettings,
+  uploadMedia,
   createAdminResource,
   deleteAdminResource,
   createAdminCreator,
@@ -109,6 +111,35 @@ export const AdminDashboardPage: React.FC = () => {
     fileFormat: 'pdf' as 'pdf' | 'zip' | 'mp4',
     isFeatured: true
   });
+
+  const [resourceFileUploading, setResourceFileUploading] = useState(false);
+  const [resourceFileUploadSuccess, setResourceFileUploadSuccess] = useState(false);
+  const resourceFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleResourceFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setResourceFileUploading(true);
+    setResourceFileUploadSuccess(false);
+    const res = await uploadMedia(file);
+    setResourceFileUploading(false);
+
+    if (res.success && res.url) {
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      const format = ext === 'zip' ? 'zip' : ext === 'mp4' ? 'mp4' : 'pdf';
+      setNewResource(prev => ({
+        ...prev,
+        fileKey: res.url!,
+        fileName: file.name,
+        fileFormat: format as any,
+      }));
+      setResourceFileUploadSuccess(true);
+      setTimeout(() => setResourceFileUploadSuccess(false), 3000);
+    } else {
+      alert(res.message || 'Resource file upload failed');
+    }
+  };
 
   const [newCreator, setNewCreator] = useState({
     name: '',
@@ -1780,15 +1811,66 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
 
                 <ImageUploadField
-                  label="Thumbnail Image *"
+                  label="Thumbnail / Cover Image *"
                   value={newResource.thumbnail}
                   onChange={(url) => setNewResource({ ...newResource, thumbnail: url })}
                   aspectRatio="16/10"
+                  helperText="Recommended: 16:10 preview mockup image"
                 />
+
+                {/* Resource Deliverable File or Link */}
+                <div style={{ backgroundColor: '#F8FAFC', border: '1px solid var(--color-border)', borderRadius: '10px', padding: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.35rem' }}>
+                    Resource Deliverable (What the Customer Actually Gets) *
+                  </label>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
+                    Upload your actual PDF, ZIP, or Video file, OR paste a Google Drive / Notion / Dropbox link:
+                  </p>
+                  
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <button
+                      type="button"
+                      disabled={resourceFileUploading}
+                      onClick={() => resourceFileInputRef.current?.click()}
+                      className="btn btn-secondary btn-sm"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', whiteSpace: 'nowrap' }}
+                    >
+                      {resourceFileUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                      <span>{resourceFileUploading ? 'Uploading File...' : 'Upload PDF/ZIP/Video'}</span>
+                    </button>
+                    <input
+                      type="file"
+                      ref={resourceFileInputRef}
+                      onChange={handleResourceFileChange}
+                      accept=".pdf,.zip,.mp4,application/pdf,application/zip,video/mp4"
+                      style={{ display: 'none' }}
+                    />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Or paste Google Drive, Notion, or Download URL (https://...)"
+                      value={newResource.fileKey}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setNewResource(prev => ({
+                          ...prev,
+                          fileKey: val,
+                          fileName: prev.fileName || (val.includes('notion') ? 'Notion Template' : val.includes('drive') ? 'Google Drive Access' : 'Digital Playbook'),
+                        }));
+                      }}
+                      style={{ flex: 1, padding: '0.55rem 0.75rem', borderRadius: '6px', border: '1px solid var(--color-border)', outline: 'none', fontSize: '0.82rem', backgroundColor: '#FFFFFF' }}
+                    />
+                  </div>
+                  {resourceFileUploadSuccess && (
+                    <span style={{ fontSize: '0.75rem', color: '#059669', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 600 }}>
+                      <Check size={13} /> Deliverable file uploaded and ready!
+                    </span>
+                  )}
+                </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>File Name *</label>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>File Name / Display Name *</label>
                     <input type="text" required placeholder="e.g. viral-hooks.pdf" value={newResource.fileName} onChange={e => setNewResource({ ...newResource, fileName: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
                   </div>
 

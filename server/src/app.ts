@@ -122,6 +122,7 @@ app.use('/api/v1/admin/bookings', adminBookingRoutes);
 app.use('/api/v1/admin/leads', adminLeadRoutes);
 app.use('/api/v1/admin/orders', orderRoutes);
 app.use('/api/v1/admin/media', mediaRoutes);
+app.use('/api/v1/media', mediaRoutes);
 app.use('/api/v1/admin/audit-logs', auditLogRoutes);
 
 // Admin Dashboard stats

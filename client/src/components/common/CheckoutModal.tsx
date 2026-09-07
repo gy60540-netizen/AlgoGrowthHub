@@ -124,6 +124,26 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const triggerFileDownload = (_token?: string) => {
+    const fileUrl = resource.fileKey;
+    if (fileUrl && (fileUrl.startsWith('http://') || fileUrl.startsWith('https://'))) {
+      window.open(fileUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (fileUrl && fileUrl.startsWith('/uploads/')) {
+      const serverBase = import.meta.env.VITE_API_BASE_URL
+        ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, '')
+        : (import.meta.env.PROD ? 'https://algogrowthhub.onrender.com' : '');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = `${serverBase}${fileUrl}`;
+      downloadLink.download = resource.fileName || `${resource.slug || 'resource'}.${resource.fileFormat || 'pdf'}`;
+      downloadLink.target = '_blank';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      return;
+    }
+
+    // Fallback confirmation document
     const element = document.createElement('a');
     const file = new Blob([
       `AlgoGrowthHub Official Asset: ${resource.title}\n` +

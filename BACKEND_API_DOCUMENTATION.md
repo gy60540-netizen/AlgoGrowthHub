@@ -870,5 +870,34 @@ Chronological event log containing `actorUserId`, `action`, `resourceType`, `ipA
 * **Status Enum Values:** `NEW`, `CONTACTED`, `QUALIFIED`, `PROPOSAL_SENT`, `WON`, `LOST`
 
 ---
+
+## 13. Media & Deliverables Upload
+
+### A. Upload Media & Resource Deliverables
+* **Endpoints:** 
+  * `POST /api/v1/admin/media/upload` (Primary)
+  * `POST /api/v1/media/upload` (Public/Admin Alias)
+* **Access:** Protected (`Bearer JWT` + Super Admin / Admin)
+* **Content-Type:** `multipart/form-data`
+* **Parameters:** `file` (Binary File: JPEG, PNG, WebP, AVIF, SVG, PDF, ZIP, MP4; Max size: 50MB)
+* **Success Response (`201 Created`):**
+```json
+{
+  "success": true,
+  "message": "File uploaded successfully",
+  "data": {
+    "id": "66ce8f91a2b3c4d5e6f7a8b9",
+    "url": "/uploads/file-1725712345-123456.pdf",
+    "fileName": "file-1725712345-123456.pdf",
+    "originalName": "viral-hooks.pdf",
+    "mimeType": "application/pdf",
+    "fileSize": 1048576
+  }
+}
+```
+* **Static File Access:** `GET /uploads/:filename`
+
+---
 *AlgoGrowthHub Backend API Suite is verified, fully tested, and ready for production consumption.*
+
 

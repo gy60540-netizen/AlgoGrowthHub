@@ -626,12 +626,12 @@ export function formatAssetUrl(url?: string): string {
   return url;
 }
 
-export async function uploadMedia(file: File): Promise<{ success: boolean; url?: string; message?: string }> {
+export async function uploadMedia(file: File): Promise<{ success: boolean; url?: string; fileName?: string; fileSize?: number; message?: string }> {
   try {
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await apiClient.post('/media/upload', formData, {
+    const res = await apiClient.post('/admin/media/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -639,12 +639,33 @@ export async function uploadMedia(file: File): Promise<{ success: boolean; url?:
 
     const rawUrl = res.data?.data?.url || res.data?.url;
     const finalUrl = formatAssetUrl(rawUrl);
-    return { success: true, url: finalUrl };
-  } catch (err: any) {
-    return {
-      success: false,
-      message: err.response?.data?.message || err.message || 'Image upload failed',
+    return { 
+      success: true, 
+      url: finalUrl,
+      fileName: res.data?.data?.fileName || file.name,
+      fileSize: res.data?.data?.fileSize || file.size,
     };
+  } catch (err: any) {
+    // Fallback try on /media/upload
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await apiClient.post('/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const rawUrl = res.data?.data?.url || res.data?.url;
+      return { 
+        success: true, 
+        url: formatAssetUrl(rawUrl),
+        fileName: res.data?.data?.fileName || file.name,
+        fileSize: res.data?.data?.fileSize || file.size,
+      };
+    } catch (fallbackErr: any) {
+      return {
+        success: false,
+        message: fallbackErr.response?.data?.message || err.response?.data?.message || err.message || 'Image upload failed',
+      };
+    }
   }
 }
 
