@@ -833,7 +833,7 @@ export const AdminDashboardPage: React.FC = () => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '2.5rem' }}>
-          <img src="/logo.png?v=2" alt="Logo" style={{ height: '36px', width: 'auto', filter: 'brightness(1.3)' }} />
+          <img src="/logo.png?v=3" alt="Logo" style={{ height: '36px', width: 'auto', filter: 'brightness(1.3)' }} />
         </div>
 
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
