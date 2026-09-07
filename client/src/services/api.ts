@@ -34,15 +34,16 @@ export const defaultSiteSettings: SiteSettings = {
   agencyName: "AlgoGrowthHub",
   logo: "/logo.png",
   tagline: "High-Impact Social Growth & Video Ecosystem",
-  contactEmail: "growth@algogrowthhub.com",
-  contactPhone: "+91 98765 43210",
+  contactEmail: "algowinner01official@gmail.com",
+  contactPhone: "+91 9369348311",
   contactAddress: "Mumbai & Bangalore, India",
   socialLinks: [
-    { platform: "Instagram", url: "https://instagram.com/algogrowthhub" },
+    { platform: "Instagram", url: "https://www.instagram.com/algowinner01?igsi=c294MDhkcDM2bDg0" },
     { platform: "YouTube", url: "https://youtube.com/@algogrowthhub" },
     { platform: "LinkedIn", url: "https://linkedin.com/company/algogrowthhub" },
-    { platform: "Telegram", url: "https://t.me/algogrowthhub" }
+    { platform: "Telegram", url: "https://t.me/algowinner01" }
   ],
+
   hero: {
     badgeText: "Real Growth. Real Numbers.",
     headline: "We Turn Social Attention Into Real Growth.",
@@ -112,12 +113,18 @@ export const defaultSiteSettings: SiteSettings = {
   },
   footer: {
     aboutText: "AlgoGrowthHub is a dedicated social media agency helping ambitious brands and creators build an engaged audience and grow sustainably.",
+    description: "AlgoGrowthHub is the premier social media growth agency and creator ecosystem helping visionary brands and creators command algorithmic attention.",
+    email: "algowinner01official@gmail.com",
+    mobile: "+91 9369348311",
+    instagramUrl: "https://www.instagram.com/algowinner01?igsi=c294MDhkcDM2bDg0",
+    twitterUrl: "https://x.com/algowinner01",
+    telegramUrl: "https://t.me/algowinner01",
     copyrightText: "© 2026 AlgoGrowthHub. All rights reserved.",
     socialLinks: [
-      { platform: "Instagram", url: "https://instagram.com/algogrowthhub" },
+      { platform: "Instagram", url: "https://www.instagram.com/algowinner01?igsi=c294MDhkcDM2bDg0" },
       { platform: "YouTube", url: "https://youtube.com/@algogrowthhub" },
       { platform: "LinkedIn", url: "https://linkedin.com/company/algogrowthhub" },
-      { platform: "Telegram", url: "https://t.me/algogrowthhub" }
+      { platform: "Telegram", url: "https://t.me/algowinner01" }
     ]
   }
 };
@@ -604,6 +611,60 @@ export async function updateAdminService(id: string, payload: any): Promise<bool
     return false;
   }
 }
+
+export function formatAssetUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  if (url.startsWith('/uploads/')) {
+    const serverBase = import.meta.env.VITE_API_BASE_URL
+      ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, '')
+      : (import.meta.env.PROD ? 'https://algogrowthhub.onrender.com' : '');
+    return `${serverBase}${url}`;
+  }
+  return url;
+}
+
+export async function uploadMedia(file: File): Promise<{ success: boolean; url?: string; message?: string }> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await apiClient.post('/media/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    const rawUrl = res.data?.data?.url || res.data?.url;
+    const finalUrl = formatAssetUrl(rawUrl);
+    return { success: true, url: finalUrl };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.message || 'Image upload failed',
+    };
+  }
+}
+
+export async function updateAdminSiteSettings(settings: Partial<SiteSettings>): Promise<{ success: boolean; message?: string }> {
+  try {
+    // Format payload to strictly match schema if needed
+    const payload: any = { ...settings };
+    if (typeof payload.logo === 'string') {
+      payload.logo = { url: payload.logo, altText: 'AlgoGrowthHub Logo' };
+    }
+    const res = await apiClient.put('/admin/settings', payload);
+    return { success: true, message: res.data?.message || 'Settings saved successfully' };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.response?.data?.message || err.message || 'Failed to save settings',
+    };
+  }
+}
+
 
 /* ==========================================================================
    PAYMENT & ORDER LIFECYCLE SERVICES

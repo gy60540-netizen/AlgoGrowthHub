@@ -26,7 +26,8 @@ import {
   MessageSquare,
   Star,
   CreditCard,
-  DollarSign
+  DollarSign,
+  Loader2
 } from 'lucide-react';
 import { 
   getSiteSettings, 
@@ -41,6 +42,7 @@ import {
   updateAdminLeadStatus,
   deleteAdminLead,
   updateAdminService,
+  updateAdminSiteSettings,
   createAdminResource,
   deleteAdminResource,
   createAdminCreator,
@@ -58,6 +60,7 @@ import {
   defaultClientResults,
   defaultResources
 } from '../../services/api';
+import { ImageUploadField } from '../../components/common/ImageUploadField';
 import { 
   SiteSettings, 
   Service, 
@@ -217,9 +220,41 @@ export const AdminDashboardPage: React.FC = () => {
     navigate('/admin/login');
   };
 
-  const handleSave = () => {
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      if (activeTab === 'hero') {
+        const res = await updateAdminSiteSettings(siteSettings);
+        if (res.success) {
+          setSaveSuccess(true);
+        } else {
+          alert(res.message || 'Failed to save settings');
+        }
+      } else if (activeTab === 'services') {
+        const updatePromises = services.map((svc) => {
+          const id = svc._id || svc.id;
+          if (!id) return Promise.resolve(true);
+          return updateAdminService(id, {
+            title: svc.title,
+            shortDescription: svc.shortDescription,
+            image: svc.image,
+            ctaLabel: svc.ctaLabel,
+            isPublished: svc.isPublished !== false,
+          });
+        });
+        await Promise.all(updatePromises);
+        setSaveSuccess(true);
+      } else {
+        setSaveSuccess(true);
+      }
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
@@ -624,9 +659,28 @@ export const AdminDashboardPage: React.FC = () => {
               </button>
             )}
 
-            <button onClick={handleSave} className="btn btn-primary btn-sm" style={{ padding: '0.75rem 1.5rem' }}>
-              {saveSuccess ? <Check size={16} /> : <Save size={16} />}
-              <span>{saveSuccess ? 'Changes Saved Live!' : 'Save CMS Updates'}</span>
+            <button 
+              onClick={handleSave} 
+              disabled={saving} 
+              className="btn btn-primary btn-sm" 
+              style={{ padding: '0.75rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}
+            >
+              {saving ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Saving to DB...</span>
+                </>
+              ) : saveSuccess ? (
+                <>
+                  <Check size={16} />
+                  <span>Changes Saved Live!</span>
+                </>
+              ) : (
+                <>
+                  <Save size={16} />
+                  <span>Save CMS Updates</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -655,15 +709,13 @@ export const AdminDashboardPage: React.FC = () => {
                     style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
                   />
                 </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Hero Background Image URL (heroImg.png)</label>
-                  <input
-                    type="text"
-                    value={siteSettings.hero?.heroImage || '/heroImg.png'}
-                    onChange={(e) => setSiteSettings({ ...siteSettings, hero: { ...siteSettings.hero, heroImage: e.target.value } })}
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
-                  />
-                </div>
+                <ImageUploadField
+                  label="Hero Background Image"
+                  value={siteSettings.hero?.heroImage || '/hero-bg.jpg'}
+                  onChange={(url) => setSiteSettings({ ...siteSettings, hero: { ...siteSettings.hero, heroImage: url } })}
+                  aspectRatio="16/9"
+                  helperText="Recommended: 1920x1080 high-res background"
+                />
               </div>
             </div>
 
@@ -709,39 +761,18 @@ export const AdminDashboardPage: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Image Preview & URL Editor */}
-                  <div style={{ marginBottom: '1.25rem' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '0.4rem' }}>
-                      Service Cover Image:
-                    </label>
-                    <div
-                      className="media-container"
-                      style={{
-                        aspectRatio: '16/10',
-                        borderRadius: 'var(--radius-md)',
-                        marginBottom: '0.6rem',
-                        border: '1px solid var(--color-border)',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <img
-                        src={svc.image || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&auto=format&fit=crop&q=80"}
-                        alt={svc.title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    </div>
-                    <input
-                      type="url"
-                      placeholder="Paste Image URL (e.g. https://... or /uploads/...)"
-                      value={svc.image || ''}
-                      onChange={(e) => {
-                        const copy = [...services];
-                        copy[i].image = e.target.value;
-                        setServices(copy);
-                      }}
-                      style={{ width: '100%', padding: '0.55rem 0.75rem', fontSize: '0.82rem', borderRadius: '6px', border: '1px solid var(--color-border)', outline: 'none' }}
-                    />
-                  </div>
+                  {/* Image Preview, File Uploader & URL Editor */}
+                  <ImageUploadField
+                    label="Service Cover Image:"
+                    value={svc.image || ''}
+                    onChange={(url) => {
+                      const copy = [...services];
+                      copy[i].image = url;
+                      setServices(copy);
+                    }}
+                    aspectRatio="16/10"
+                    helperText="Aspect ratio 16:10 for perfect grid geometry"
+                  />
 
                   {/* Title */}
                   <div style={{ marginBottom: '1rem' }}>
@@ -1579,10 +1610,13 @@ export const AdminDashboardPage: React.FC = () => {
                   <input type="text" required placeholder="e.g. aarav.invests" value={newCreator.instagramUsername} onChange={e => setNewCreator({ ...newCreator, instagramUsername: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Profile Image URL (1:1 Ratio) *</label>
-                  <input type="url" required value={newCreator.profileImage} onChange={e => setNewCreator({ ...newCreator, profileImage: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
-                </div>
+                <ImageUploadField
+                  label="Profile Image (1:1 Ratio) *"
+                  value={newCreator.profileImage}
+                  onChange={(url) => setNewCreator({ ...newCreator, profileImage: url })}
+                  aspectRatio="1/1"
+                  helperText="Recommended: Square headshot photo"
+                />
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Short Bio / Niche Statement *</label>
@@ -1622,10 +1656,13 @@ export const AdminDashboardPage: React.FC = () => {
                   <input type="text" required placeholder="e.g. Head of Paid Performance & Viral Growth" value={newTeamMember.role} onChange={e => setNewTeamMember({ ...newTeamMember, role: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Photo Image URL (4:5 Aspect Ratio) *</label>
-                  <input type="url" required value={newTeamMember.image} onChange={e => setNewTeamMember({ ...newTeamMember, image: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
-                </div>
+                <ImageUploadField
+                  label="Photo Image (4:5 Aspect Ratio) *"
+                  value={newTeamMember.image}
+                  onChange={(url) => setNewTeamMember({ ...newTeamMember, image: url })}
+                  aspectRatio="4/5"
+                  helperText="Recommended: 4:5 portrait headshot"
+                />
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div>
@@ -1666,15 +1703,19 @@ export const AdminDashboardPage: React.FC = () => {
                   <input type="text" required placeholder="e.g. GrowthX E-Commerce" value={newClientResult.clientName} onChange={e => setNewClientResult({ ...newClientResult, clientName: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Before Screenshot URL *</label>
-                  <input type="url" required value={newClientResult.beforeImage} onChange={e => setNewClientResult({ ...newClientResult, beforeImage: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
-                </div>
+                <ImageUploadField
+                  label="Before Screenshot *"
+                  value={newClientResult.beforeImage}
+                  onChange={(url) => setNewClientResult({ ...newClientResult, beforeImage: url })}
+                  aspectRatio="16/9"
+                />
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>After Screenshot URL *</label>
-                  <input type="url" required value={newClientResult.afterImage} onChange={e => setNewClientResult({ ...newClientResult, afterImage: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
-                </div>
+                <ImageUploadField
+                  label="After Screenshot *"
+                  value={newClientResult.afterImage}
+                  onChange={(url) => setNewClientResult({ ...newClientResult, afterImage: url })}
+                  aspectRatio="16/9"
+                />
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Client Rating (1 to 5 Stars)</label>
@@ -1738,10 +1779,12 @@ export const AdminDashboardPage: React.FC = () => {
                   )}
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Thumbnail Image URL *</label>
-                  <input type="url" required value={newResource.thumbnail} onChange={e => setNewResource({ ...newResource, thumbnail: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
-                </div>
+                <ImageUploadField
+                  label="Thumbnail Image *"
+                  value={newResource.thumbnail}
+                  onChange={(url) => setNewResource({ ...newResource, thumbnail: url })}
+                  aspectRatio="16/10"
+                />
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div>
