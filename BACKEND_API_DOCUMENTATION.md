@@ -553,12 +553,12 @@ Includes `agencyName`, `logo`, `theme` (preset, primaryColor, primaryHover, seco
 ```json
 {
   "clientName": "SaaS Launchpad",
-  "niche": "B2B SaaS",
-  "beforeMetric": "5K Impressions / mo",
-  "afterMetric": "1.2M Impressions / mo",
-  "growthPercentage": 2400,
-  "starRating": 5,
-  "testimonial": "AlgoGrowthHub is the best agency we ever partnered with.",
+  "description": "Engineered multi-channel organic reel funnels resulting in 2.4M reach.",
+  "instagramUrl": "https://instagram.com/saaslaunchpad",
+  "beforeImage": "/uploads/results/before1.png",
+  "afterImage": "/uploads/results/after1.png",
+  "rating": 5,
+  "isFeatured": true,
   "status": "PUBLISHED"
 }
 ```

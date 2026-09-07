@@ -146,6 +146,8 @@ export interface ClientResult {
   _id?: string;
   id?: string;
   clientName: string;
+  description?: string;
+  instagramUrl?: string;
   clientHandle?: string;
   platform?: string;
   beforeImage: string;

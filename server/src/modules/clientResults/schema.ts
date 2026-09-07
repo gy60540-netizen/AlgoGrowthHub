@@ -4,6 +4,8 @@ import { CONTENT_STATUS } from '../../config/constants.js';
 export const createClientResultSchema = z.object({
   body: z.object({
     clientName: z.string().min(2, 'Client name is required'),
+    description: z.string().optional(),
+    instagramUrl: z.string().optional(),
     beforeImage: z.string().min(1, 'Before image URL is required'),
     afterImage: z.string().min(1, 'After image URL is required'),
     rating: z.number().min(1).max(5).default(5),
@@ -22,6 +24,8 @@ export const updateClientResultSchema = z.object({
   }),
   body: z.object({
     clientName: z.string().min(2).optional(),
+    description: z.string().optional(),
+    instagramUrl: z.string().optional(),
     beforeImage: z.string().optional(),
     afterImage: z.string().optional(),
     rating: z.number().min(1).max(5).optional(),

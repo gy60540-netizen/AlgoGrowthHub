@@ -3,6 +3,8 @@ import { CONTENT_STATUS, ContentStatus } from '../../config/constants.js';
 
 export interface IClientResult extends Document {
   clientName: string;
+  description?: string;
+  instagramUrl?: string;
   beforeImage: string;
   afterImage: string;
   rating: number; // 1 to 5
@@ -17,6 +19,8 @@ export interface IClientResult extends Document {
 const clientResultSchema = new Schema<IClientResult>(
   {
     clientName: { type: String, required: true, trim: true },
+    description: { type: String, trim: true },
+    instagramUrl: { type: String, trim: true },
     beforeImage: { type: String, required: true },
     afterImage: { type: String, required: true },
     rating: { type: Number, required: true, min: 1, max: 5, default: 5 },

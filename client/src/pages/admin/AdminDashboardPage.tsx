@@ -210,6 +210,8 @@ export const AdminDashboardPage: React.FC = () => {
 
   const [newClientResult, setNewClientResult] = useState({
     clientName: '',
+    description: '',
+    instagramUrl: '',
     beforeImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80',
     afterImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
     rating: 5,
@@ -245,6 +247,8 @@ export const AdminDashboardPage: React.FC = () => {
   const [editingClientResult, setEditingClientResult] = useState<{
     id: string;
     clientName: string;
+    description?: string;
+    instagramUrl?: string;
     beforeImage: string;
     afterImage: string;
     rating: number;
@@ -683,6 +687,8 @@ export const AdminDashboardPage: React.FC = () => {
 
     const res = await createAdminClientResult({
       clientName: newClientResult.clientName,
+      description: newClientResult.description,
+      instagramUrl: newClientResult.instagramUrl,
       beforeImage: newClientResult.beforeImage,
       afterImage: newClientResult.afterImage,
       rating: Number(newClientResult.rating),
@@ -696,6 +702,8 @@ export const AdminDashboardPage: React.FC = () => {
       setIsClientModalOpen(false);
       setNewClientResult({
         clientName: '',
+        description: '',
+        instagramUrl: '',
         beforeImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80',
         afterImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
         rating: 5,
@@ -720,6 +728,8 @@ export const AdminDashboardPage: React.FC = () => {
     setEditingClientResult({
       id: clId,
       clientName: item.clientName || '',
+      description: item.description || '',
+      instagramUrl: item.instagramUrl || '',
       beforeImage: item.beforeImage || '',
       afterImage: item.afterImage || '',
       rating: item.rating || 5,
@@ -737,6 +747,8 @@ export const AdminDashboardPage: React.FC = () => {
 
     const res = await updateAdminClientResult(editingClientResult.id, {
       clientName: editingClientResult.clientName,
+      description: editingClientResult.description,
+      instagramUrl: editingClientResult.instagramUrl,
       beforeImage: editingClientResult.beforeImage,
       afterImage: editingClientResult.afterImage,
       rating: editingClientResult.rating,
@@ -2534,6 +2546,16 @@ export const AdminDashboardPage: React.FC = () => {
                   <input type="text" required placeholder="e.g. GrowthX E-Commerce" value={newClientResult.clientName} onChange={e => setNewClientResult({ ...newClientResult, clientName: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
                 </div>
 
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Description / Tagline</label>
+                  <input type="text" placeholder="e.g. Scaled viral short-form organic brand reach to 3.4M+" value={newClientResult.description} onChange={e => setNewClientResult({ ...newClientResult, description: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Instagram Profile URL</label>
+                  <input type="text" placeholder="e.g. https://instagram.com/growthx" value={newClientResult.instagramUrl} onChange={e => setNewClientResult({ ...newClientResult, instagramUrl: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
                 <ImageUploadField
                   label="Before Screenshot *"
                   value={newClientResult.beforeImage}
@@ -2990,6 +3012,16 @@ export const AdminDashboardPage: React.FC = () => {
                 <div>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Client / Brand Name *</label>
                   <input type="text" required placeholder="e.g. GrowthX E-Commerce" value={editingClientResult.clientName} onChange={e => setEditingClientResult({ ...editingClientResult, clientName: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Description / Tagline</label>
+                  <input type="text" placeholder="e.g. Scaled viral short-form organic brand reach to 3.4M+" value={editingClientResult.description || ''} onChange={e => setEditingClientResult({ ...editingClientResult, description: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Instagram Profile URL</label>
+                  <input type="text" placeholder="e.g. https://instagram.com/growthx" value={editingClientResult.instagramUrl || ''} onChange={e => setEditingClientResult({ ...editingClientResult, instagramUrl: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none' }} />
                 </div>
 
                 <ImageUploadField

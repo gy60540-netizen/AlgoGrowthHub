@@ -332,6 +332,8 @@ export const defaultTeam: ExpertTeamMember[] = [
 export const defaultClientResults: ClientResult[] = [
   {
     clientName: "NexGen Fintech",
+    description: "Scaled organic B2B thought leadership and founder branding with 3.4M+ reach.",
+    instagramUrl: "https://instagram.com/nexgenfintech",
     beforeImage: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80",
     afterImage: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80",
     rating: 5,
@@ -341,6 +343,8 @@ export const defaultClientResults: ClientResult[] = [
   },
   {
     clientName: "Aura Skincare",
+    description: "D2C beauty brand viral video strategy driving a 420% increase in store referrals.",
+    instagramUrl: "https://instagram.com/auraskincare",
     beforeImage: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=600&q=80",
     afterImage: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=80",
     rating: 5,
@@ -350,6 +354,8 @@ export const defaultClientResults: ClientResult[] = [
   },
   {
     clientName: "Elevate EdTech",
+    description: "Full-funnel student enrollment campaigns and viral short-form micro-learning clips.",
+    instagramUrl: "https://instagram.com/elevateedtech",
     beforeImage: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=600&q=80",
     afterImage: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80",
     rating: 5,

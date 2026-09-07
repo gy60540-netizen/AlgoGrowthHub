@@ -26,7 +26,7 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
 
   const imageSrc = (data.image && !data.image.includes('unsplash') && data.image !== '/booking-call.png') 
     ? formatAssetUrl(data.image) 
-    : '/booking-call.png?v=2';
+    : '/booking-call.png?v=3';
 
   const [formData, setFormData] = useState<BookingPayload>({
     name: '',
@@ -584,7 +584,7 @@ export const BookCallSection: React.FC<BookCallSectionProps> = ({ settings }) =>
                 src={imageSrc}
                 alt="Book Strategy Call Creator Studio"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/booking-call.png?v=2';
+                  (e.target as HTMLImageElement).src = '/booking-call.png?v=3';
                 }}
                 style={{
                   width: '100%',
