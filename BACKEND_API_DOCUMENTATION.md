@@ -898,6 +898,46 @@ Chronological event log containing `actorUserId`, `action`, `resourceType`, `ipA
 * **Static File Access:** `GET /uploads/:filename`
 
 ---
+
+## 14. Orders & Transactions Management
+
+### A. List All Orders (Admin)
+* **Endpoints:** 
+  * `GET /api/v1/admin/orders` (Primary)
+  * `GET /api/v1/orders` (Alias)
+* **Access:** Protected (`Bearer JWT` + Super Admin / Admin)
+* **Query Parameters:** `page`, `limit`, `status` (`CREATED`, `PENDING`, `PAID`, `FULFILLED`, `REFUNDED`, `FAILED`)
+* **Success Response (`200 OK`):**
+```json
+{
+  "success": true,
+  "message": "Orders retrieved successfully",
+  "data": [
+    {
+      "_id": "6a9ec56e535348fc183b952e",
+      "userName": "Raghunath Chauhan",
+      "userEmail": "raghunath25122002@gmail.com",
+      "userPhone": "9369348311",
+      "amount": 1,
+      "currency": "INR",
+      "provider": "razorpay",
+      "status": "PAID",
+      "providerOrderId": "order_TZAsXT8DFvL011",
+      "providerPaymentId": "pay_TZAsdZ0m5Ezsa6"
+    }
+  ],
+  "pagination": { "page": 1, "limit": 20, "total": 1, "pages": 1 }
+}
+```
+
+### B. Refund Order (Super Admin)
+* **Endpoints:**
+  * `POST /api/v1/admin/orders/:id/refund`
+  * `POST /api/v1/orders/:id/refund`
+* **Access:** Protected (`Bearer JWT` + Super Admin)
+* **Success Response (`200 OK`):** Status transitions to `REFUNDED`.
+
+---
 *AlgoGrowthHub Backend API Suite is verified, fully tested, and ready for production consumption.*
 
 

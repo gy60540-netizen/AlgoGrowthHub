@@ -746,7 +746,17 @@ export async function verifyPayment(payload: VerifyPaymentPayload): Promise<{ su
 
 export async function getAdminOrders(): Promise<{ success: boolean; data: any[]; message?: string }> {
   try {
-    const res = await apiClient.get('/orders');
+    // Try primary admin route /admin/orders
+    let res;
+    try {
+      res = await apiClient.get('/admin/orders');
+    } catch (adminErr: any) {
+      if (adminErr.response?.status === 404) {
+        res = await apiClient.get('/orders');
+      } else {
+        throw adminErr;
+      }
+    }
     const list = res.data?.data?.orders || res.data?.data || res.data?.orders || (Array.isArray(res.data) ? res.data : []);
     return { success: true, data: list };
   } catch (err: any) {
@@ -760,7 +770,16 @@ export async function getAdminOrders(): Promise<{ success: boolean; data: any[];
 
 export async function refundAdminOrder(orderId: string, reason?: string): Promise<{ success: boolean; message?: string }> {
   try {
-    const res = await apiClient.post(`/orders/${orderId}/refund`, { reason: reason || 'Customer requested refund' });
+    let res;
+    try {
+      res = await apiClient.post(`/admin/orders/${orderId}/refund`, { reason: reason || 'Customer requested refund' });
+    } catch (adminErr: any) {
+      if (adminErr.response?.status === 404) {
+        res = await apiClient.post(`/orders/${orderId}/refund`, { reason: reason || 'Customer requested refund' });
+      } else {
+        throw adminErr;
+      }
+    }
     return { success: true, message: res.data?.message || 'Refund processed successfully' };
   } catch (err: any) {
     return {
