@@ -717,7 +717,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   const handleDeleteClientResult = async (id?: string) => {
     if (!id) return;
-    if (window.confirm('Delete this before/after client showcase?')) {
+    if (window.confirm('Delete this client brand?')) {
       await deleteAdminClientResult(id);
       setClientResults(prev => prev.filter(c => c._id !== id && c.id !== id));
     }
@@ -855,7 +855,7 @@ export const AdminDashboardPage: React.FC = () => {
             { id: 'creators', label: `Creator Network (${creators.length})`, icon: <Users size={18} /> },
             { id: 'creator-apps', label: `Creator Applications (${creatorApplications.length})`, icon: <Sparkles size={18} /> },
             { id: 'team', label: `Expert Team (${team.length})`, icon: <Users size={18} /> },
-            { id: 'clients', label: `Client Results (${clientResults.length})`, icon: <Award size={18} /> },
+            { id: 'clients', label: `Client Brands (${clientResults.length})`, icon: <Award size={18} /> },
             { id: 'resources', label: `Resources & Kits (${resources.length})`, icon: <BookOpen size={18} /> },
             { id: 'bookings', label: `Strategy Bookings (${bookings.length})`, icon: <Calendar size={18} /> },
             { id: 'orders', label: `Orders & Revenue (${orders.length})`, icon: <CreditCard size={18} /> },
@@ -930,7 +930,7 @@ export const AdminDashboardPage: React.FC = () => {
               {activeTab === 'creators' && `Creator Community — Instagram ONLY (${creators.length})`}
               {activeTab === 'creator-apps' && `Creator Applications & Roster Inquiries (${creatorApplications.length})`}
               {activeTab === 'team' && `Expert Team Members — Insta + LinkedIn (${team.length})`}
-              {activeTab === 'clients' && `Client Before & After Showcase (${clientResults.length})`}
+              {activeTab === 'clients' && `Client Brands (${clientResults.length})`}
               {activeTab === 'resources' && `Digital Resources, Playbooks & Growth Kits (${resources.length})`}
               {activeTab === 'bookings' && `Live Strategy Inquiries & Consultation Bookings (${bookings.length})`}
               {activeTab === 'orders' && `Live Orders & Digital Sales Stream (${orders.length})`}
@@ -981,7 +981,7 @@ export const AdminDashboardPage: React.FC = () => {
                 style={{ padding: '0.75rem 1.4rem' }}
               >
                 <Plus size={16} />
-                <span>Add Client Showcase</span>
+                <span>Add Client Brand</span>
               </button>
             )}
 
@@ -1316,22 +1316,35 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 5: Client Results (With Add Modal & Delete) */}
+        {/* Tab 5: Client Brands (With Add Modal & Delete) */}
         {activeTab === 'clients' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             {clientResults.map((item, i) => {
               const clId = item._id || item.id;
+              const imgUrl = formatAssetUrl(item.afterImage || item.beforeImage);
+              const rawHandle = item.instagramUrl || item.clientHandle || item.clientName.toLowerCase().replace(/\s+/g, '.').replace(/[^a-z0-9._]/g, '');
+              const cleanHandle = rawHandle
+                .replace(/^https?:\/\/(www\.)?instagram\.com\//, '')
+                .replace(/\/$/, '')
+                .replace(/^@/, '');
+              const instaUrl = rawHandle.startsWith('http') ? rawHandle : `https://instagram.com/${cleanHandle}`;
+
               return (
                 <div key={clId || i} className="hub-card" style={{ backgroundColor: 'var(--color-white)', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                    <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>
-                      {item.clientName}
-                    </h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                    <img 
+                      src={imgUrl} 
+                      alt={item.clientName} 
+                      onError={(e) => {
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.clientName)}&background=1F05E5&color=fff&size=400&bold=true`;
+                      }}
+                      style={{ width: '64px', height: '64px', borderRadius: '12px', objectFit: 'cover', border: '1px solid var(--color-border)' }} 
+                    />
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <button
                         type="button"
                         onClick={() => handleOpenEditClientResult(item)}
-                        title="Edit Client Case Study"
+                        title="Edit Client Brand"
                         style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: 'var(--color-primary)', borderRadius: '6px', cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                       >
                         <Edit3 size={15} />
@@ -1339,7 +1352,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleDeleteClientResult(clId)}
-                        title="Delete Client Result"
+                        title="Delete Client Brand"
                         style={{ background: '#FEE2E2', border: '1px solid #FECACA', color: '#EF4444', borderRadius: '6px', cursor: 'pointer', padding: '0.35rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                       >
                         <Trash2 size={15} />
@@ -1347,36 +1360,27 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                    <div>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.2rem' }}>BEFORE</span>
-                      <img 
-                        src={formatAssetUrl(item.beforeImage)} 
-                        alt="Before" 
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80';
-                        }}
-                        style={{ height: '85px', width: '100%', objectFit: 'cover', borderRadius: '4px' }} 
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#10B981', display: 'block', marginBottom: '0.2rem' }}>AFTER</span>
-                      <img 
-                        src={formatAssetUrl(item.afterImage)} 
-                        alt="After" 
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80';
-                        }}
-                        style={{ height: '85px', width: '100%', objectFit: 'cover', borderRadius: '4px' }} 
-                      />
-                    </div>
-                  </div>
+                  <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '0.35rem' }}>
+                    {item.clientName}
+                  </h3>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#F59E0B', fontSize: '0.85rem', fontWeight: 700 }}>
-                    {[...Array(item.rating || 5)].map((_, idx) => (
-                      <Star key={idx} size={14} fill="#F59E0B" />
-                    ))}
-                    <span style={{ color: 'var(--color-text-primary)', marginLeft: '0.35rem' }}>{item.rating || 5}.0 Verified</span>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.5, marginBottom: '0.85rem' }}>
+                    {item.description || item.testimonial || item.metricsSummary || 'Brand growth & viral marketing client.'}
+                  </p>
+
+                  <div style={{ marginTop: 'auto', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <a
+                      href={instaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', fontWeight: 700, color: '#E11D48', textDecoration: 'none' }}
+                    >
+                      <Instagram size={15} />
+                      <span>@{cleanHandle || 'brand'}</span>
+                    </a>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#059669', backgroundColor: '#ECFDF5', padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                      Verified Client
+                    </span>
                   </div>
                 </div>
               );
@@ -2527,12 +2531,12 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* Modal 3: Add New Client Result */}
+        {/* Modal 3: Add New Client */}
         {isClientModalOpen && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1.5rem' }}>
             <div className="hub-card" style={{ width: '100%', maxWidth: '540px', backgroundColor: 'var(--color-white)', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Add Client Case Study</h2>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Add Client Brand</h2>
                 <button onClick={() => setIsClientModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
                   <X size={20} />
                 </button>
@@ -2557,31 +2561,15 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
 
                 <ImageUploadField
-                  label="Before Screenshot *"
-                  value={newClientResult.beforeImage}
-                  onChange={(url) => setNewClientResult({ ...newClientResult, beforeImage: url })}
+                  label="Client / Brand Showcase Image *"
+                  value={newClientResult.afterImage || newClientResult.beforeImage}
+                  onChange={(url) => setNewClientResult({ ...newClientResult, beforeImage: url, afterImage: url })}
                   aspectRatio="16/9"
                 />
-
-                <ImageUploadField
-                  label="After Screenshot *"
-                  value={newClientResult.afterImage}
-                  onChange={(url) => setNewClientResult({ ...newClientResult, afterImage: url })}
-                  aspectRatio="16/9"
-                />
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Client Rating (1 to 5 Stars)</label>
-                  <select value={newClientResult.rating} onChange={e => setNewClientResult({ ...newClientResult, rating: Number(e.target.value) })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none', backgroundColor: 'var(--color-white)' }}>
-                    <option value={5}>⭐⭐⭐⭐⭐ (5.0 Stars)</option>
-                    <option value={4}>⭐⭐⭐⭐ (4.0 Stars)</option>
-                    <option value={3}>⭐⭐⭐ (3.0 Stars)</option>
-                  </select>
-                </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
                   <button type="button" onClick={() => setIsClientModalOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
-                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Adding...' : 'Add Client Result'}</button>
+                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Adding...' : 'Add Client Brand'}</button>
                 </div>
               </form>
             </div>
@@ -2995,12 +2983,12 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* Modal 8: Edit Client Case Study */}
+        {/* Modal: Edit Client */}
         {isEditClientModalOpen && editingClientResult && (
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999, padding: '1.5rem' }}>
             <div className="hub-card" style={{ width: '100%', maxWidth: '540px', backgroundColor: 'var(--color-white)', padding: '2.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Edit Client Case Study</h2>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800 }}>Edit Client Brand</h2>
                 <button onClick={() => setIsEditClientModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
                   <X size={20} />
                 </button>
@@ -3025,31 +3013,15 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
 
                 <ImageUploadField
-                  label="Before Screenshot *"
-                  value={editingClientResult.beforeImage}
-                  onChange={(url) => setEditingClientResult({ ...editingClientResult, beforeImage: url })}
+                  label="Client / Brand Showcase Image *"
+                  value={editingClientResult.afterImage || editingClientResult.beforeImage}
+                  onChange={(url) => setEditingClientResult({ ...editingClientResult, beforeImage: url, afterImage: url })}
                   aspectRatio="16/9"
                 />
-
-                <ImageUploadField
-                  label="After Screenshot *"
-                  value={editingClientResult.afterImage}
-                  onChange={(url) => setEditingClientResult({ ...editingClientResult, afterImage: url })}
-                  aspectRatio="16/9"
-                />
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Client Rating (1 to 5 Stars)</label>
-                  <select value={editingClientResult.rating} onChange={e => setEditingClientResult({ ...editingClientResult, rating: Number(e.target.value) })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', outline: 'none', backgroundColor: 'var(--color-white)' }}>
-                    <option value={5}>⭐⭐⭐⭐⭐ (5.0 Stars)</option>
-                    <option value={4}>⭐⭐⭐⭐ (4.0 Stars)</option>
-                    <option value={3}>⭐⭐⭐ (3.0 Stars)</option>
-                  </select>
-                </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
                   <button type="button" onClick={() => setIsEditClientModalOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
-                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Saving...' : 'Update Case Study'}</button>
+                  <button type="submit" disabled={modalLoading} className="btn btn-primary btn-sm">{modalLoading ? 'Saving...' : 'Update Client Brand'}</button>
                 </div>
               </form>
             </div>
