@@ -442,7 +442,7 @@ export const AdminDashboardPage: React.FC = () => {
       } else if (activeTab === 'services') {
         const updatePromises = services.map((svc) => {
           const id = svc._id || svc.id;
-          if (!id) return Promise.resolve(true);
+          if (!id) return Promise.resolve({ success: true, message: '' });
           return updateAdminService(id, {
             title: svc.title,
             shortDescription: svc.shortDescription,
@@ -451,8 +451,17 @@ export const AdminDashboardPage: React.FC = () => {
             isPublished: svc.isPublished !== false,
           });
         });
-        await Promise.all(updatePromises);
+        const results = await Promise.all(updatePromises);
+        const failed = results.filter((r) => !r.success);
+        if (failed.length > 0) {
+          alert(`Failed to save ${failed.length} service(s): ${failed[0].message || 'Authentication error'}. Please log in again if your session has expired.`);
+          return;
+        }
         setSaveSuccess(true);
+        const liveServices = await getServices();
+        if (liveServices && liveServices.length > 0) {
+          setServices(liveServices);
+        }
       } else {
         setSaveSuccess(true);
       }
@@ -1182,12 +1191,22 @@ export const AdminDashboardPage: React.FC = () => {
                     type="button"
                     onClick={async () => {
                       if (svcId) {
-                        await updateAdminService(svcId, {
+                        const res = await updateAdminService(svcId, {
                           title: svc.title,
                           shortDescription: svc.shortDescription,
                           image: svc.image,
+                          ctaLabel: svc.ctaLabel,
+                          isPublished: svc.isPublished !== false,
                         });
-                        alert(`Service 0${i + 1} (${svc.title}) updated live in database!`);
+                        if (res.success) {
+                          alert(`Service 0${i + 1} (${svc.title}) updated live in database!`);
+                          const liveServices = await getServices();
+                          if (liveServices && liveServices.length > 0) {
+                            setServices(liveServices);
+                          }
+                        } else {
+                          alert(`Failed to update service: ${res.message || 'Authentication error. Please re-login.'}`);
+                        }
                       } else {
                         handleSave();
                       }

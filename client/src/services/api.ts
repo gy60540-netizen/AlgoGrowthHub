@@ -33,6 +33,79 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+// Response interceptor: auto-refresh expired JWT access tokens using refresh token
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: any) => void }> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token!);
+    }
+  });
+  failedQueue = [];
+};
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response?.status === 401 && 
+      !originalRequest?._retry && 
+      !originalRequest?.url?.includes('/auth/login') && 
+      !originalRequest?.url?.includes('/auth/refresh')
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((newToken) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            }
+            return apiClient(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const refreshRes = await axios.post(
+          `${API_BASE}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
+        const payload = refreshRes.data?.data || refreshRes.data;
+        const newToken = payload?.accessToken;
+        if (newToken) {
+          localStorage.setItem('token', newToken);
+          apiClient.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          }
+          processQueue(null, newToken);
+          return apiClient(originalRequest);
+        }
+      } catch (refreshErr) {
+        processQueue(refreshErr, null);
+        if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') && !window.location.pathname.includes('/login')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = '/admin/login?expired=1';
+        }
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Fallback Defaults
 export const defaultSiteSettings: SiteSettings = {
   agencyName: "AlgoGrowthHub",
@@ -649,12 +722,13 @@ export async function deleteAdminClientResult(id: string): Promise<boolean> {
   }
 }
 
-export async function updateAdminService(id: string, payload: any): Promise<boolean> {
+export async function updateAdminService(id: string, payload: any): Promise<{ success: boolean; message?: string }> {
   try {
-    await apiClient.patch(`/admin/services/${id}`, payload);
-    return true;
-  } catch (err) {
-    return false;
+    const res = await apiClient.patch(`/admin/services/${id}`, payload);
+    return { success: true, message: res.data?.message || 'Service updated successfully' };
+  } catch (err: any) {
+    const message = err.response?.data?.error?.message || err.response?.data?.message || err.message || 'Failed to update service';
+    return { success: false, message };
   }
 }
 

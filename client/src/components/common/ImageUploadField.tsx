@@ -91,20 +91,25 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
     setUploadSuccess(false);
 
     try {
-      // 1. Generate immediate, persistent WebP Data URL
-      // This ensures the image NEVER disappears when Render container restarts or redeploys!
+      // 1. Generate immediate WebP Data URL for instant feedback
       const persistentDataUrl = await compressImageToDataUrl(file, 1000, 0.85);
 
       if (persistentDataUrl) {
         onChange(persistentDataUrl);
         setUploadSuccess(true);
-        setTimeout(() => setUploadSuccess(false), 3000);
       }
 
-      // 2. Also attempt server upload in background
-      uploadMedia(file).catch(() => {
-        // Silently keep persistentDataUrl if server storage is offline or ephemeral
-      });
+      // 2. Upload file to server and use server asset URL if successful
+      try {
+        const uploadRes = await uploadMedia(file);
+        if (uploadRes && uploadRes.success && uploadRes.url) {
+          onChange(uploadRes.url);
+          setUploadSuccess(true);
+        }
+      } catch {
+        // Silently keep compressed dataUrl if server storage is offline
+      }
+      setTimeout(() => setUploadSuccess(false), 3000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Image processing failed. Please paste a direct image URL.');
     } finally {
