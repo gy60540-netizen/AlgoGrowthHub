@@ -1,226 +1,176 @@
-# ⚡ AlgoGrowthHub — Enterprise Digital Growth & Creator Monetization Platform
+# AlgoGrowthHub
 
-<div align="center">
+Full-stack web application for digital growth services, client bookings, lead management, digital resource sales, and affiliate referral tracking.
 
-<img src="./client/public/logo.png" alt="AlgoGrowthHub Logo" width="120" style="border-radius: 16px; margin-bottom: 12px;" />
-
-### **High-Performance Full-Stack Agency & Creator Acceleration SaaS**
-
-[![Website Status](https://img.shields.io/badge/Production-Live%20Website-brightgreen?style=for-the-badge&logo=google-chrome&logoColor=white)](https://algogrowthhub.com)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.21-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas%20Cluster-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Vite](https://img.shields.io/badge/Vite-6.1-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![License](https://img.shields.io/badge/License-ISC-purple?style=for-the-badge)](./LICENSE)
+[![Live Website](https://img.shields.io/badge/Live-algogrowthhub.com-2ea44f?style=flat-square)](https://algogrowthhub.com)
+[![React](https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose%208-47a248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 
 ---
 
-### 🌐 **Live Production Deployment:** [https://algogrowthhub.com](https://algogrowthhub.com)  
-### 📖 **Comprehensive API Specs:** [`BACKEND_API_DOCUMENTATION.md`](./BACKEND_API_DOCUMENTATION.md)
+## Overview
 
-</div>
+AlgoGrowthHub provides a client-facing website and an administrative portal for managing digital agency operations:
 
----
+- **Client Acquisition:** Service catalog, before-and-after client results, creator rosters, and consultation booking forms.
+- **Digital Products:** Downloadable resources (free and paid) with Razorpay payment processing and tokenized download URLs.
+- **Lead and Booking Pipeline:** Captures incoming inquiries and consultation requests with stage tracking for administrators.
+- **Affiliate Program:** Referral code generation, cookie-based attribution, conversion tracking, and commission calculation.
+- **Content Management:** Administrative dashboard to update hero content, testimonials, team members, services, and SEO metadata without redeploying.
 
-## 📌 Table of Contents
-1. [Overview & Business Context](#-overview--business-context)
-2. [Key Architecture & Engineering Highlights](#-key-architecture--engineering-highlights)
-3. [System Architecture Diagram](#-system-architecture-diagram)
-4. [Core Features & Modules](#-core-features--modules)
-   - [Customer & Public Experience](#1-customer--public-experience)
-   - [Admin Command Center (CMS & Operations)](#2-admin-command-center-cms--operations)
-   - [Partner & Referral Affiliate Engine](#3-partner--referral-affiliate-engine)
-   - [E-Commerce & Digital Resource Protection](#4-e-commerce--digital-resource-protection)
-5. [Tech Stack](#-tech-stack)
-6. [API Architecture & Endpoints](#-api-architecture--endpoints)
-7. [Security & Authentication Hardening](#-security--authentication-hardening)
-8. [Local Development & Quickstart](#-local-development--quickstart)
-9. [Environment Variables](#-environment-variables)
-10. [Testing & Quality Assurance](#-testing--quality-assurance)
+Live website: [https://algogrowthhub.com](https://algogrowthhub.com)
 
 ---
 
-## 🚀 Overview & Business Context
+## Features
 
-**AlgoGrowthHub** is a production-grade digital acceleration platform and SaaS built for modern social media agencies, high-ticket creators, and brands. 
+### Public Portal
+- **Service Listings:** Catalog of agency services and deliverables with interactive detail views.
+- **Client Results & Reviews:** Case studies showing verified metric changes and customer reviews.
+- **Strategy Call Booking:** Intake form for scheduling 1-on-1 strategy sessions.
+- **Digital Resource Library:** Free and paid guides, templates, and video assets.
 
-Rather than a static agency showcase, AlgoGrowthHub functions as a **complete client acquisition, digital monetization, and operational pipeline**:
-- **Monetization Engine:** Handles paid consultation bookings, digital playbook checkouts with Razorpay SDK verification, and tokenized instant downloads.
-- **Affiliate & Referral Engine:** Custom referral links, attribution tracking cookies, automated commission calculations, and partner analytics dashboards.
-- **Enterprise Content CMS:** Full dynamic CMS powering client success case studies (before/after metrics), service grids, creator rosters, team directories, and site SEO metadata.
-- **Operations & Lead CRM:** Integrated lead intake pipeline, automated audit logging for admin actions, and real-time revenue analytics.
+### E-Commerce & Payments
+- **Razorpay Checkout:** Client-side Razorpay modal with server-side signature verification.
+- **Protected Downloads:** One-time expiring download tokens for paid digital assets.
+- **Order State Machine:** Tracks orders from creation through payment verification and fulfillment.
 
----
+### Partner & Referral Tracking
+- **Referral Links:** Parameter-based referral tracking (`/ref/:code`) stored via client cookies.
+- **Partner Dashboard:** Affiliate portal showing clicks, conversions, and accrued commissions.
 
-## 💎 Key Architecture & Engineering Highlights
-
-* **Domain-Driven Modular Architecture (DDD):** Backend is decoupled into 16 independent domain modules (`auth`, `users`, `orders`, `payments`, `bookings`, `leads`, `referrals`, `resources`, `auditLogs`, etc.) with dedicated models, controllers, services, and route layers.
-* **Dual-Token JWT Authentication:** Short-lived access tokens (15m memory/header) paired with secure `HttpOnly`, `SameSite` refresh cookie rotation for zero-vulnerability session persistence.
-* **Strict Type Safety End-to-End:** 100% written in TypeScript 5.7 across both Client and Server, with Zod runtime schema validations guarding all mutation payloads.
-* **High-Resiliency MongoDB Setup:** Designed for replica-set clusters with explicit fallback strategies to maintain continuous uptime under varying DNS and network topologies.
-* **Granular RBAC Guards:** Tiered permissions separating `SUPER_ADMIN`, `ADMIN`, `PARTNER`, and `CLIENT` with route-level middleware protection.
-* **Audit Logging Subsystem:** Every administrative update, settings change, and status progression is automatically written to an immutable audit trail.
-
----
-
-## 🏗️ System Architecture Diagram
-
-```mermaid
-flowchart TD
-    Client["Client Browser / Mobile App\n(React 19 + TypeScript + Vite)"]
-    CDN["Production Domain\nalgogrowthhub.com"]
-    
-    subgraph Gateway ["Express 4.21 Gateway & Security"]
-        Helmet["Helmet Security Headers"]
-        RateLimit["Rate Limiter (express-rate-limit)"]
-        Cors["CORS Policy Guard"]
-        CookieParser["Cookie Parser"]
-    end
-    
-    subgraph Middlewares ["Pipeline Interceptors"]
-        AuthGuard["JWT Auth Guard (Dual-Token)"]
-        RBAC["Role Guard (RBAC)"]
-        ZodValidator["Zod Schema Validation"]
-    end
-
-    subgraph BusinessModules ["16 Modular Business Domains"]
-        AuthMod["Auth & Session Module"]
-        OrderMod["Orders & Razorpay Gateway"]
-        BookingMod["Strategy Bookings Pipeline"]
-        LeadMod["Lead Capture & Funnel CRM"]
-        ReferralMod["Affiliate & Commission Engine"]
-        ResourceMod["Digital Downloads (Tokenized)"]
-        CMSMod["Site Settings & Content CMS"]
-        AuditMod["System Audit Trail"]
-    end
-
-    subgraph DataStore ["Database & External Services"]
-        Mongo[("MongoDB Atlas Replica Set\n(Mongoose 8.10)")]
-        Razorpay["Razorpay Payment Gateway API"]
-        Storage["Media Storage Engine"]
-    end
-
-    Client --> CDN --> Helmet --> RateLimit --> Cors --> CookieParser
-    CookieParser --> AuthGuard --> RBAC --> ZodValidator
-    ZodValidator --> BusinessModules
-    BusinessModules --> Mongo
-    OrderMod --> Razorpay
-    CMSMod --> Storage
-```
+### Admin Dashboard & CMS
+- **Overview Metrics:** Summary cards for revenue, leads, bookings, and active partners.
+- **Lead Pipeline:** Administrative interface to review and update inbound lead statuses.
+- **Content Management:** CMS controls for hero banners, FAQs, creator profiles, and team members.
+- **Audit Logging:** Logs administrative mutations with actor details, timestamps, and IP addresses.
 
 ---
 
-## ✨ Core Features & Modules
+## Tech Stack
 
-### 1. Customer & Public Experience
-- **Fluid Modern UI:** Tailored with Google Fonts (*Plus Jakarta Sans* & *Inter*), dark/light responsive layouts, smooth micro-interactions, and Lucide vector graphics.
-- **Interactive Service Matrix:** Modular 3x3 service card grid with real-time detail modal breakdowns.
-- **Client Results & Proof Engine:** Verified growth metrics, before/after statistics, follower milestones, and rating showcases.
-- **1-on-1 Consultation Booking:** Calendar-based slot picker and lead qualification funnel with instant confirmation.
+### Frontend
+- **Framework:** React 19 with Vite 6
+- **Language:** TypeScript 5.7
+- **Routing:** React Router 7
+- **HTTP Client:** Axios
+- **Icons & Styling:** Lucide React, Tailwind CSS
 
-### 2. Admin Command Center (CMS & Operations)
-- **High-Throughput Dashboard:** Real-time metrics tracking total revenue, monthly recurring bookings, active leads, and referral conversion rates.
-- **Complete Content Management (CMS):** Update hero banners, testimonials, team rosters, FAQ accordions, and pricing tiers dynamically without redeploying code.
-- **Lead Pipeline:** Kanban-style lead status tracking (`NEW` ➔ `CONTACTED` ➔ `QUALIFIED` ➔ `WON` ➔ `LOST`).
-- **Audit Logs:** Immutable audit log tracking IP addresses, timestamps, admin identities, and target entities.
+### Backend
+- **Runtime:** Node.js (ES Modules, Node 20+)
+- **Framework:** Express 4.21
+- **Language:** TypeScript 5.7
+- **Validation:** Zod 3.24
+- **Security:** Helmet, CORS, Cookie-Parser, Express-Rate-Limit
+- **Authentication:** JSON Web Tokens (jsonwebtoken), Bcrypt.js
 
-### 3. Partner & Referral Affiliate Engine
-- **Custom Referral Tracking:** Unique link creation (`/ref/:code`) with persistent cookie attribution.
-- **Automated Payout Calculations:** Configurable percentage/fixed commissions calculated on order and booking settlements.
-- **Partner Portal:** Self-serve dashboard where affiliates monitor clicks, converted sales, and pending payouts.
-
-### 4. E-Commerce & Digital Resource Protection
-- **Razorpay Checkout SDK Integration:** Server-side cryptographic signature verification (`razorpay_order_id`, `razorpay_payment_id`, `razorpay_signature`).
-- **Protected Digital Assets:** Premium ebooks, templates, and video guides delivered through secure, one-time expiring download tokens.
+### Database & Storage
+- **Database:** MongoDB with Mongoose 8.10 ODM
+- **File Uploads:** Multer with local filesystem storage and Cloudinary support
 
 ---
 
-## 🛠️ Tech Stack
-
-### **Frontend**
-| Technology | Description |
-| :--- | :--- |
-| **React 19** | Modern component architecture, hooks, and concurrent features |
-| **TypeScript 5.7** | End-to-end type safety, interfaces, and strict type checking |
-| **Vite 6** | Lightning-fast build tooling and HMR dev server |
-| **React Router 7** | Client-side routing, nested layouts, and route guards |
-| **Axios** | HTTP client with automatic token attachment and interceptors |
-| **Lucide Icons** | Lightweight, scalable vector icons |
-| **Tailwind CSS** | Utility-first responsive design system |
-
-### **Backend**
-| Technology | Description |
-| :--- | :--- |
-| **Node.js (ESM)** | Modern ECMAScript module runtime (v20+ / v24+) |
-| **Express 4.21** | REST API framework structured in modular DDD pattern |
-| **MongoDB Atlas** | Cloud database managed through Mongoose 8.10 ODM schemas |
-| **Zod 3.24** | Declarative runtime input validation and sanitization |
-| **Bcrypt.js** | Cryptographic password hashing (12 rounds) |
-| **JSONWebToken** | Dual-token authentication with Access & Refresh tokens |
-| **Helmet & Cors** | Security headers and cross-origin resource sharing protection |
-| **Express Rate Limit** | Tiered rate limiting against brute-force and DDoS attacks |
-
----
-
-## 📡 API Architecture & Endpoints
-
-All endpoints are versioned under `/api/v1`. Comprehensive request/response bodies and error schemas are documented in [`BACKEND_API_DOCUMENTATION.md`](./BACKEND_API_DOCUMENTATION.md).
-
-| Module | Route Prefix | Key Functionality |
-| :--- | :--- | :--- |
-| **Auth** | `/api/v1/auth` | User/Admin login, token refresh, logout, profile fetch |
-| **Users** | `/api/v1/users` | RBAC user management, roles, status changes |
-| **Settings** | `/api/v1/settings` | Global CMS settings (Hero, About, Footer, SEO metadata) |
-| **Services** | `/api/v1/services` | Service catalog CRUD, deliverables, pricing tiers |
-| **Creators** | `/api/v1/creators` | Creator community roster, Instagram metrics showcase |
-| **Team** | `/api/v1/team` | Expert leadership profiles and social handles |
-| **Results** | `/api/v1/results` | Verified before/after client case studies & reviews |
-| **Resources** | `/api/v1/resources` | Free & premium digital downloads with tokenized URLs |
-| **Bookings** | `/api/v1/bookings` | 1-on-1 strategy call bookings & scheduling pipeline |
-| **Leads** | `/api/v1/leads` | Inbound client intake funnel and status lifecycle |
-| **Orders** | `/api/v1/orders` | Order creation, payment state machine, invoice data |
-| **Payments** | `/api/v1/payments` | Razorpay signature verification and webhook processing |
-| **Referrals** | `/api/v1/referrals` | Affiliate codes, link tracking, partner commission ledger |
-| **Audit Logs**| `/api/v1/audit-logs` | Tamper-proof administrative action trail |
-
----
-
-## 🔒 Security & Authentication Hardening
+## Architecture
 
 ```text
-[Client Request] 
-      │
-      ▼
-┌────────────────────────────────────────────────────────┐
-│ 1. Rate Limiting: 100 req / 15 min per IP              │
-│ 2. Helmet: Content-Security-Policy & HSTS              │
-│ 3. CORS: Whitelisted domain (algogrowthhub.com) only   │
-└──────────────────────────┬─────────────────────────────┘
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│ 4. Access Token verification (Header Bearer)           │
-│    - Expired? ➔ Refresh via HttpOnly Cookie (7 Days)   │
-│ 5. Role-Based Permission Check (RBAC)                  │
-│ 6. Zod Runtime Schema Validation & Sanitization        │
-└──────────────────────────┬─────────────────────────────┘
-                           ▼
-                  [Domain Controller]
+[ Client Browser ]
+        │  HTTPS (React 19 / Vite)
+        ▼
+[ Express API Gateway ] (/api/v1)
+   ├── Helmet (Security Headers)
+   ├── CORS Guard
+   ├── Rate Limiting (300 req / 15 min global; 20 req / 15 min auth)
+   └── Cookie Parser
+        │
+   ├── [ Middlewares ]
+   │      ├── JWT Authentication (Bearer Header)
+   │      ├── Role Guard (SUPER_ADMIN, ADMIN, USER, PARTNER)
+   │      └── Zod Request Validation
+        │
+   ├── [ Business Modules ]
+   │      ├── Auth, Users, Site Settings
+   │      ├── Services, Creators, Team, Client Results
+   │      ├── Bookings, Leads, Resources
+   │      ├── Orders, Payments, Referrals, Audit Logs
+        │
+        ├──▶ MongoDB (Mongoose 8 Schemas)
+        ├──▶ Razorpay API (Payment Verification)
+        └──▶ Storage (Local / Cloudinary)
 ```
-
-* **Password Security:** Salted with 12 rounds of `bcrypt`.
-* **Cookie Isolation:** Refresh tokens are dispatched with `httpOnly: true`, `secure: true`, and `sameSite: "strict"`.
-* **Zero Secret Leakage:** Strict `.gitignore` policy prevents private keys and DB connection strings from ever entering version control.
 
 ---
 
-## 💻 Local Development & Quickstart
+## Project Structure
+
+```text
+AlgoGrowthHub/
+├── client/                     # Frontend application (React 19 + Vite)
+│   ├── src/
+│   │   ├── components/         # Reusable UI components and section layouts
+│   │   ├── pages/              # Route pages (Home, Services, Bookings, Admin, Partner)
+│   │   ├── services/           # Axios API client and route handlers
+│   │   └── types/              # TypeScript interface definitions
+│   └── package.json
+│
+├── server/                     # Backend REST API (Node.js + Express)
+│   ├── src/
+│   │   ├── config/             # DB connection, environment variables, role constants
+│   │   ├── middlewares/        # Auth, role check, rate limit, error handler, validation
+│   │   ├── modules/            # Domain modules (auth, orders, bookings, leads, etc.)
+│   │   ├── scripts/            # Database seed and automated scenario runners
+│   │   ├── utils/              # JWT helpers, response formatters, AppError
+│   │   ├── app.ts              # Express application assembly
+│   │   └── server.ts           # HTTP server bootstrap
+│   ├── tests/                  # API integration test suite (Vitest + Supertest)
+│   └── package.json
+│
+└── BACKEND_API_DOCUMENTATION.md# Detailed endpoint specifications
+```
+
+---
+
+## API Overview
+
+All backend routes are mounted under the `/api/v1` prefix. Detailed request schemas, status codes, and error payloads are documented in [`BACKEND_API_DOCUMENTATION.md`](./BACKEND_API_DOCUMENTATION.md).
+
+| Route Prefix | Access | Description |
+| :--- | :--- | :--- |
+| `GET /api/health` | Public | Service health check |
+| `/api/v1/auth` | Public / Auth | User registration, login, token refresh, and logout |
+| `/api/v1/settings` | Public | Public CMS settings (hero, about, footer, SEO) |
+| `/api/v1/services` | Public | Service catalog and deliverables |
+| `/api/v1/client-results` | Public | Before/after client showcases and reviews |
+| `/api/v1/resources` | Public | Free and premium digital resource downloads |
+| `/api/v1/bookings` | Public | Consultation call booking requests |
+| `/api/v1/leads` | Public | Lead capture intake form |
+| `/api/v1/payments` | Public / Auth | Razorpay order creation and signature verification |
+| `/api/v1/referrals` | Public | Referral link validation and tracking |
+| `/api/v1/partner` | Partner | Affiliate partner dashboard data and commissions |
+| `/api/v1/admin/*` | Admin | Administrative CRUD for users, CMS, leads, orders, audit logs |
+
+---
+
+## Authentication & Security
+
+- **Tokens:** Dual-token JWT system.
+  - Access Token: Short-lived (default `15m`), passed in the `Authorization: Bearer <token>` header.
+  - Refresh Token: Long-lived (default `7d`), stored in an `HttpOnly`, `SameSite` cookie.
+- **Passwords:** Hashed with `bcryptjs` using 12 salt rounds before persisting to MongoDB.
+- **Authorization:** Role-based access control supporting `SUPER_ADMIN`, `ADMIN`, `USER`, and `PARTNER`.
+- **Validation:** All incoming request bodies and query parameters are validated against Zod schemas.
+- **Rate Limiting:** Express-rate-limit configured with a global limit of 300 requests per 15 minutes, and 20 requests per 15 minutes on authentication routes.
+- **Headers:** Helmet middleware configured to set standard security headers.
+
+---
+
+## Getting Started
 
 ### Prerequisites
-* **Node.js** v20.x or higher
-* **npm** v10.x or higher
-* **MongoDB** connection string (Local or MongoDB Atlas)
+- Node.js (v20 or higher)
+- npm (v10 or higher)
+- MongoDB instance (local or MongoDB Atlas connection string)
 
 ### 1. Clone the Repository
 ```bash
@@ -233,87 +183,79 @@ cd AlgoGrowthHub
 cd server
 npm install
 
-# Copy environment variables template
+# Copy example environment configuration
 cp .env.example .env
-# Edit .env with your MongoDB URI, JWT secrets, and Razorpay keys
 ```
 
-### 3. Seed Initial Database & Super Admin
+Open `server/.env` and update the values as needed:
+```ini
+PORT=5000
+NODE_ENV=development
+MONGO_URI=mongodb://localhost:27017/algogrowthhub
+CORS_ORIGIN=http://localhost:5173
+
+JWT_ACCESS_SECRET=your_access_token_secret
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_SECRET=your_refresh_token_secret
+JWT_REFRESH_EXPIRES_IN=7d
+
+SUPER_ADMIN_NAME="Super Admin"
+SUPER_ADMIN_EMAIL=admin@example.com
+SUPER_ADMIN_PASSWORD=your_secure_password
+
+PAYMENT_PROVIDER=mock
+STORAGE_PROVIDER=local
+```
+
+### 3. Seed Database
 ```bash
-# Automatically seeds default settings, services, resources, and admin credentials
+# Populates default CMS settings, initial services, and super admin account
 npm run seed
 ```
 
-### 4. Start Backend Server
+### 4. Run Backend
 ```bash
 npm run dev
-# Server boots on http://localhost:5000 (API: http://localhost:5000/api/v1)
+# Server runs on http://localhost:5000
 ```
 
-### 5. Configure & Start Frontend
-In a separate terminal:
+### 5. Configure & Run Frontend
+In a separate terminal window:
 ```bash
-cd client
+cd ../client
 npm install
 npm run dev
-# Frontend boots on http://localhost:5173
+# Frontend runs on http://localhost:5173
 ```
 
 ---
 
-## ⚙️ Environment Variables
+## Testing
 
-### Backend (`server/.env`)
-```ini
-NODE_ENV=development
-PORT=5000
-CLIENT_URL=http://localhost:5173
-
-# Database Connection (MongoDB Atlas Cluster)
-MONGO_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/algogrowthhub?retryWrites=true&w=majority
-
-# JWT Authentication
-JWT_ACCESS_SECRET=your_super_secret_access_key_min_32_chars
-JWT_REFRESH_SECRET=your_super_secret_refresh_key_min_32_chars
-JWT_ACCESS_EXPIRY=15m
-JWT_REFRESH_EXPIRY=7d
-
-# Initial Super Admin Seed Credentials
-SUPER_ADMIN_EMAIL=admin@algogrowthhub.com
-SUPER_ADMIN_PASSWORD=SuperSecurePassword123!
-
-# Razorpay Payment Gateway (Optional for local testing)
-RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxx
-RAZORPAY_KEY_SECRET=your_razorpay_secret
-```
-
-### Frontend (`client/.env`)
-```ini
-VITE_API_BASE_URL=http://localhost:5000/api/v1
-VITE_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxx
-```
-
----
-
-## 🧪 Testing & Quality Assurance
-
-The codebase includes end-to-end integration and scenario tests:
+Backend test suites use Vitest and Supertest:
 
 ```bash
-# Run backend test suite
 cd server
-npm run test
 
-# Run end-to-end scenario validation script
+# Run integration tests
+npm test
+
+# Run end-to-end scenario runner
 npm run test:e2e
 ```
 
 ---
 
-## 👨‍💻 Developer & Contact
+## Related Documentation
 
-**Developed by:** Gaurav ([@gy60540-netizen](https://github.com/gy60540-netizen))  
-**Official Website:** [https://algogrowthhub.com](https://algogrowthhub.com)  
-**Email:** [gy60540@gmail.com](mailto:gy60540@gmail.com)  
+- [`BACKEND_API_DOCUMENTATION.md`](./BACKEND_API_DOCUMENTATION.md) — Endpoint specifications, payload examples, and error codes.
+- [`PRD_AlgoGrowthHub_Merged_Final.md`](./PRD_AlgoGrowthHub_Merged_Final.md) — Product requirements and business specifications.
+- [`PRD_AlgoGrowthHub_Referral_Tracking_System.md`](./PRD_AlgoGrowthHub_Referral_Tracking_System.md) — Referral engine and attribution architecture.
 
-*Built with passion for scalable web architecture, clean code, and production reliability.*
+---
+
+## Author
+
+**Gaurav**  
+GitHub: [@gy60540-netizen](https://github.com/gy60540-netizen)  
+Website: [https://algogrowthhub.com](https://algogrowthhub.com)
